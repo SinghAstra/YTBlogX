@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
-import user from "../assets/user.png";
-import { AuthContext } from "../context/AuthContext";
+import user from "../../assets/user.png";
+import { AuthContext } from "../../context/AuthContext";
 import "./Register.css";
 
 const Register = () => {
