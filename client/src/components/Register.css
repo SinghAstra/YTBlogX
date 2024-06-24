@@ -12,15 +12,21 @@
   max-width: 420px;
   border-radius: 10px;
   border: 2px solid var(--border-color);
-  padding: 30px 40px;
-  color: var(--white);
-  gap: 20px;
+  padding: 10px 30px;
+  color: var(--text-color);
+  gap: 25px;
 }
 
 .register-form h1 {
   text-align: center;
   font-size: 36px;
-  margin-bottom: 20px;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.input-row {
+  display: flex;
+  gap: 20px;
 }
 
 .input-container {
@@ -39,27 +45,28 @@
 .input-container input {
   width: 100%;
   background: transparent;
-  border: 2px solid var(--white);
+  border: none;
+  border-bottom: 1px solid white;
   outline: none;
   padding: 8px 16px;
-  color: var(--white);
-  border-radius: 4px;
+  color: var(--text-color);
 }
 
 .input-container input:focus {
-  color: var(--secondary);
-  border: 2px solid var(--secondary);
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .input-container input:focus + label,
 .input-container input:valid + label {
-  color: var(--secondary);
+  color: var(--primary-color);
   top: -12px;
+  font-size: 12px;
 }
 
 .register-form .btn-submit {
   width: 100%;
-  background: var(--white);
+  background: var(--primary-color);
   color: var(--background-color);
   border-radius: 40px;
   height: 45px;
@@ -67,8 +74,32 @@
   font-size: 18px;
   cursor: pointer;
   margin-top: 20px;
+  border: none;
 }
 
 .register-form .btn-submit:hover {
-  background: rgb(197, 195, 195);
+  background: var(--primary-light-color);
+}
+
+.profile-picture-container {
+  background-color: var(--primary-light-color);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto;
+  margin-top: -20px;
+  cursor: pointer;
+}
+
+.profile-picture-placeholder-container:hover {
+  background-color: var(--primary-color);
+}
+
+.profile-picture-placeholder,
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  padding: 2px;
+  object-fit: cover;
 }
