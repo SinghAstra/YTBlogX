@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 import user from "../assets/user.png";
 import "./Register.css";
 
@@ -36,8 +37,98 @@ const Register = () => {
     }
   };
 
+  const validateFirstName = (firstName) => {
+    const nameRegex = /^[A-Za-z]{2,}$/;
+    if (!firstName || !nameRegex.test(firstName)) {
+      toast.error("Invalid First Name");
+      return false;
+    }
+    return true;
+  };
+
+  const validateLastName = (lastName) => {
+    const nameRegex = /^[A-Za-z]{2,}$/;
+    if (!lastName || !nameRegex.test(lastName)) {
+      toast.error("Invalid Last Name");
+      return false;
+    }
+    return true;
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return false;
+    }
+    return true;
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!password || !passwordRegex.test(password)) {
+      toast.error(
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const validateLocation = (location) => {
+    if (!location) {
+      toast.error("Location is required.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateOccupation = (occupation) => {
+    if (!occupation) {
+      toast.error("Occupation is required.");
+      return false;
+    }
+    return true;
+  };
+
+  const validatePicture = (picture) => {
+    if (!picture) {
+      toast.error("Please upload a profile picture.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateFormData = () => {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      location,
+      occupation,
+      picture,
+    } = formData;
+
+    return (
+      validateFirstName(firstName) &&
+      validateLastName(lastName) &&
+      validateEmail(email) &&
+      validatePassword(password) &&
+      validateLocation(location) &&
+      validateOccupation(occupation) &&
+      validatePicture(picture)
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateFormData()) {
+      return;
+    }
+
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
@@ -53,9 +144,9 @@ const Register = () => {
           },
         }
       );
-      console.log(response.data);
+      toast.success(response.data.message);
     } catch (error) {
-      console.log("Error registering user:", error);
+      toast.error(error.response.data.message);
     }
   };
 
