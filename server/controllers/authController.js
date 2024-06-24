@@ -3,11 +3,7 @@ import User from "../models/User.js";
 
 export const registerController = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, location, occupation } =
-      req.body;
-
-    console.log("Request body:", req.body);
-    console.log("Uploaded file:", req.file);
+    const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: "Missing Credentials." });
@@ -32,13 +28,11 @@ export const registerController = async (req, res) => {
       email,
       password: passwordHash,
       picturePath,
-      location,
-      occupation,
       viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
 
-    // await newUser.save();
+    await newUser.save();
 
     res.status(201).json({ newUser, message: "Registered successfully." });
   } catch (err) {

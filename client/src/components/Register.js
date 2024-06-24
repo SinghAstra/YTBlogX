@@ -11,8 +11,7 @@ const Register = () => {
     email: "mrrobot@gmail.com",
     password: "Abhay@codeman1",
     picture: "",
-    location: "London",
-    occupation: "Security Analyst",
+    confirmPassword: "Abhay@codeman1",
   });
 
   const [profilePicture, setProfilePicture] = useState(null);
@@ -76,22 +75,6 @@ const Register = () => {
     return true;
   };
 
-  const validateLocation = (location) => {
-    if (!location) {
-      toast.error("Location is required.");
-      return false;
-    }
-    return true;
-  };
-
-  const validateOccupation = (occupation) => {
-    if (!occupation) {
-      toast.error("Occupation is required.");
-      return false;
-    }
-    return true;
-  };
-
   const validatePicture = (picture) => {
     if (!picture) {
       toast.error("Please upload a profile picture.");
@@ -100,24 +83,24 @@ const Register = () => {
     return true;
   };
 
+  const validateConfirmPassword = (password, confirmPassword) => {
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return false;
+    }
+    return true;
+  };
+
   const validateFormData = () => {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      location,
-      occupation,
-      picture,
-    } = formData;
+    const { firstName, lastName, email, password, picture, confirmPassword } =
+      formData;
 
     return (
       validateFirstName(firstName) &&
       validateLastName(lastName) &&
       validateEmail(email) &&
       validatePassword(password) &&
-      validateLocation(location) &&
-      validateOccupation(occupation) &&
+      validateConfirmPassword(password, confirmPassword) &&
       validatePicture(picture)
     );
   };
@@ -232,27 +215,15 @@ const Register = () => {
         </div>
         <div className="input-container">
           <input
-            type="text"
-            name="location"
-            value={formData.location}
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
             onChange={handleChange}
             autoComplete="off"
-            id="location"
+            id="confirmPassword"
             required
           />
-          <label htmlFor="location">Location</label>
-        </div>
-        <div className="input-container">
-          <input
-            type="text"
-            name="occupation"
-            value={formData.occupation}
-            onChange={handleChange}
-            autoComplete="off"
-            id="occupation"
-            required
-          />
-          <label htmlFor="occupation">Occupation</label>
+          <label htmlFor="confirmPassword">Confirm Password</label>
         </div>
         <button type="submit" className="btn-submit">
           Submit
