@@ -1,20 +1,20 @@
+import axios from "axios";
 import React, { useState } from "react";
 import user from "../assets/user.png";
 import "./Register.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
+    firstName: "Mr",
+    lastName: "Robot",
+    email: "mrrobot@gmail.com",
+    password: "Abhay@codeman1",
     picture: "",
-    location: "",
-    occupation: "",
+    location: "London",
+    occupation: "Security Analyst",
   });
 
   const [profilePicture, setProfilePicture] = useState(null);
-  console.log("profilePicture is ", profilePicture);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,19 +24,38 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
-
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfilePicture(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const pictureUrl = URL.createObjectURL(file);
+      setProfilePicture(pictureUrl);
+      setFormData({
+        ...formData,
+        picture: file,
+      });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => {
+      data.append(key, formData[key]);
+    });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.log("Error registering user:", error);
     }
   };
 
@@ -153,14 +172,3 @@ const Register = () => {
 };
 
 export default Register;
-
-// {/* <div className="input-container">
-//   <input
-//     type="file"
-//     id="picture"
-//     name="picture"
-//     onChange={(e) =>
-//       setFormData({ ...formData, picture: e.target.files[0] })
-//     }
-//   />
-// </div> */}
