@@ -52,6 +52,18 @@
   color: var(--text-color);
 }
 
+.input-container .input-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.input-container .input-icon:hover {
+  color: var(--primary-color);
+}
+
 .input-container input:focus {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);

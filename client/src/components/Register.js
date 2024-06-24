@@ -1,20 +1,36 @@
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import user from "../assets/user.png";
+import { AuthContext } from "../context/AuthContext";
 import "./Register.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "Mr",
     lastName: "Robot",
-    email: "mrrobot@gmail.com",
+    email: "mrrobot2@gmail.com",
     password: "Abhay@codeman1",
     picture: "",
     confirmPassword: "Abhay@codeman1",
   });
 
   const [profilePicture, setProfilePicture] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { handleLogIn } = useContext(AuthContext);
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -112,6 +128,8 @@ const Register = () => {
       return;
     }
 
+    setLoading(true);
+
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
@@ -120,16 +138,14 @@ const Register = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/register",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        data
       );
       toast.success(response.data.message);
+      handleLogIn(response.data.token);
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -203,7 +219,7 @@ const Register = () => {
         </div>
         <div className="input-container">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -212,10 +228,15 @@ const Register = () => {
             required
           />
           <label htmlFor="password">Password</label>
+          <FontAwesomeIcon
+            icon={showPassword ? faEyeSlash : faEye}
+            className="input-icon"
+            onClick={toggleShowPassword}
+          />
         </div>
         <div className="input-container">
           <input
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
@@ -224,6 +245,11 @@ const Register = () => {
             required
           />
           <label htmlFor="confirmPassword">Confirm Password</label>
+          <FontAwesomeIcon
+            icon={showConfirmPassword ? faEyeSlash : faEye}
+            className="input-icon"
+            onClick={toggleShowConfirmPassword}
+          />
         </div>
         <button type="submit" className="btn-submit">
           Submit
