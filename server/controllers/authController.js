@@ -102,3 +102,40 @@ export const fetchUserInfoUsingEmail = async (req, res) => {
     res.status(500).json({ message: "Error while fetching user info." });
   }
 };
+
+export const loginController = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    // Check if user exists in the database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the provided password matches the hashed password in the database
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Return the token and user information
+    res.json({ token, message: "Login successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Error while logging in" });
+  }
+};
