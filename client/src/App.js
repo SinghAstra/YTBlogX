@@ -6,10 +6,13 @@ import {
   createRoutesFromChildren,
 } from "react-router-dom";
 import Loader from "./components/Loader/Loader";
+import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
-import Register from "./components/Register";
+import Register from "./components/Register/Register";
 import { AuthContext } from "./context/AuthContext";
+import Home from "./pages/Home/Home";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   const { isAuthenticating } = useContext(AuthContext);
@@ -21,14 +24,14 @@ function App() {
   const routes = createRoutesFromChildren(
     <>
       <Route element={<PublicRoute />}>
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* <Route path="/recovery" element={<Recovery />} /> */}
         {/* <Route path="/reset" element={<Reset />} /> */}
       </Route>
       <Route element={<PrivateRoute />}>
-        {/* <Route path="/" element={<Home />} /> */}
-        {/* <Route path="profile" element={<Profile />} /> */}
+        <Route path="/" element={<Home />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       {/* <Route path="*" element={<NotFound />} /> */}
     </>
@@ -36,11 +39,7 @@ function App() {
 
   const router = createBrowserRouter(routes);
 
-  return (
-    <RouterProvider router={router}>
-      <Toaster />
-    </RouterProvider>
-  );
+  return <RouterProvider router={router}></RouterProvider>;
 }
 
 export default App;
