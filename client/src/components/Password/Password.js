@@ -16,12 +16,19 @@ const Password = ({
     setShowPassword(!showPassword);
   };
 
+  const avatarSrc = userInfo.picturePath
+    ? `http://localhost:5000/assets/${userInfo.picturePath
+        .replace(/\\/g, "/")
+        .split("/")
+        .pop()}`
+    : user;
+
   return (
     <div className="password-login-container">
       <form onSubmit={handlePasswordSubmit} className="password-login-form">
         <h1>Login</h1>
         <div className="password-login-avatar-container">
-          <img src={user} alt="avatar" className="avatar" />
+          <img src={avatarSrc} alt="avatar" className="avatar" />
         </div>
         <div className="input-container">
           <input
