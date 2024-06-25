@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
+import { AuthContext } from "../../context/AuthContext";
 import Email from "../Email/Email";
 import Password from "../Password/Password";
 
@@ -11,7 +12,7 @@ const Login = () => {
     password: "",
   });
   const [userInfo, setUserInfo] = useState({});
-  // const { handleLogIn } = useContext(AuthContext);
+  const { saveJWTToken } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +87,7 @@ const Login = () => {
           }
         );
         console.log("response: ", response);
-        // handleLogIn(response.data.token);
+        saveJWTToken(response.data.token);
         toast.success(response.data.message);
       } catch (error) {
         toast.error(error.response.data.message);

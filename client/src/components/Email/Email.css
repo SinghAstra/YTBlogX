@@ -59,6 +59,25 @@
   background: var(--primary-light-color);
 }
 
+.bottom-text {
+  text-align: center;
+}
+
+.bottom-link {
+  text-decoration: none;
+  color: var(--primary-light-color);
+}
+
+.bottom-link:hover,
+.bottom-span:hover {
+  color: var(--primary-color);
+}
+
+.bottom-span {
+  color: var(--primary-light-color);
+  cursor: pointer;
+}
+
 @media (min-width: 768px) {
   .email-login-form {
     width: 420px;

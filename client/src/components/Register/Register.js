@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 import user from "../../assets/user.png";
 import { AuthContext } from "../../context/AuthContext";
 import "./Register.css";
@@ -22,7 +23,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { handleLogIn } = useContext(AuthContext);
+  const { saveJWTToken } = useContext(AuthContext);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -147,7 +148,7 @@ const Register = () => {
         data
       );
       toast.success(response.data.message);
-      handleLogIn(response.data.token);
+      saveJWTToken(response.data.token);
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -255,6 +256,12 @@ const Register = () => {
         <button type="submit" className="btn-submit">
           Submit
         </button>
+        <p className="bottom-text">
+          Already a member?{" "}
+          <Link to="/login" className="bottom-link">
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );

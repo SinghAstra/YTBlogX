@@ -117,3 +117,16 @@
   padding: 2px;
   object-fit: cover;
 }
+
+.bottom-text {
+  text-align: center;
+}
+
+.bottom-link {
+  text-decoration: none;
+  color: var(--primary-light-color);
+}
+
+.bottom-link:hover {
+  color: var(--primary-color);
+}

@@ -40,7 +40,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogIn = async (token) => {
+  const saveJWTToken = async (token) => {
     localStorage.setItem("token", token);
     await verifyToken(token);
   };
@@ -59,7 +59,7 @@ const AuthProvider = ({ children }) => {
         setUser,
         isAuthenticating,
         setIsAuthenticating,
-        handleLogIn,
+        saveJWTToken,
         handleLogOut,
       }}
     >

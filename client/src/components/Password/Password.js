@@ -1,6 +1,7 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import user from "../../assets/user.png";
 import "./Password.css";
 
@@ -11,6 +12,22 @@ const Password = ({
   handleChange,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [shouldNavigate, setShouldNavigate] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (shouldNavigate) {
+      navigate("/verify", {
+        state: {
+          userInfo,
+        },
+      });
+    }
+  }, [shouldNavigate, navigate, userInfo]);
+
+  const handleResetPasswordClick = () => {
+    setShouldNavigate(true);
+  };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -49,6 +66,12 @@ const Password = ({
         <button type="submit" className="btn-submit">
           Submit
         </button>
+        <p className="bottom-text">
+          Forgot Password ?{" "}
+          <span onClick={handleResetPasswordClick} className="bottom-span">
+            Reset Password
+          </span>
+        </p>
       </form>
     </div>
   );

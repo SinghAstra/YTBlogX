@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import user from "../../assets/user.png";
 import "./Email.css";
 
@@ -24,6 +25,12 @@ const Email = ({ email, handleChange, handleEmailSubmit }) => {
         <button type="submit" className="btn-submit">
           Submit
         </button>
+        <p className="bottom-text">
+          New User ?{" "}
+          <Link to="/register" className="bottom-link">
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
