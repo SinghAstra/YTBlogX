@@ -18,7 +18,6 @@ const Email = ({ email, handleChange, handleEmailSubmit }) => {
             onChange={handleChange}
             autoComplete="off"
             id="email"
-            required
           />
           <label htmlFor="email">Email</label>
         </div>

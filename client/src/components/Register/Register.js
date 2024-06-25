@@ -9,12 +9,12 @@ import "./Register.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: "Mr",
-    lastName: "Robot",
-    email: "mrrobot2@gmail.com",
-    password: "Abhay@codeman1",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
     picture: "",
-    confirmPassword: "Abhay@codeman1",
+    confirmPassword: "",
   });
 
   const [profilePicture, setProfilePicture] = useState(null);
@@ -38,6 +38,12 @@ const Register = () => {
       ...formData,
       [name]: value,
     });
+    const inputContainer = e.target.closest(".input-container");
+    if (value.trim() !== "") {
+      inputContainer.classList.add("has-text");
+    } else {
+      inputContainer.classList.remove("has-text");
+    }
   };
 
   const handlePictureChange = (e) => {
@@ -188,7 +194,6 @@ const Register = () => {
               onChange={handleChange}
               autoComplete="off"
               id="firstName"
-              required
             />
             <label htmlFor="firstName">First Name</label>
           </div>
@@ -200,7 +205,6 @@ const Register = () => {
               onChange={handleChange}
               autoComplete="off"
               id="lastName"
-              required
             />
             <label htmlFor="lastName">Last Name</label>
           </div>
@@ -213,7 +217,6 @@ const Register = () => {
             onChange={handleChange}
             autoComplete="off"
             id="email"
-            required
           />
           <label htmlFor="email">Email</label>
         </div>
@@ -225,7 +228,6 @@ const Register = () => {
             onChange={handleChange}
             autoComplete="off"
             id="password"
-            required
           />
           <label htmlFor="password">Password</label>
           <FontAwesomeIcon
@@ -242,7 +244,6 @@ const Register = () => {
             onChange={handleChange}
             autoComplete="off"
             id="confirmPassword"
-            required
           />
           <label htmlFor="confirmPassword">Confirm Password</label>
           <FontAwesomeIcon

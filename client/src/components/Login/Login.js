@@ -16,10 +16,22 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    const inputContainer = e.target.closest(".input-container");
+    if (value.trim() !== "") {
+      inputContainer.classList.add("has-text");
+    } else {
+      inputContainer.classList.remove("has-text");
+    }
   };
 
-  //  Implement Validate Email
-  const validateEmail = (email) => {};
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Invalid email address");
+      return false;
+    }
+    return true;
+  };
 
   const validatePassword = (password) => {
     const lengthRegex = /.{8,}/;
@@ -45,9 +57,13 @@ const Login = () => {
     const { email } = formData;
     if (validateEmail(email)) {
       try {
-        const response = await axios.get("http://localhost:5000/api/user/", {
-          email,
-        });
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/fetchUserInfo",
+          {
+            email,
+          }
+        );
+        console.log("response.data.user is ", response.data.user);
         setUserInfo(response.data.user);
         setStep(2);
       } catch (error) {
