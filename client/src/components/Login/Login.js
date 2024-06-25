@@ -82,7 +82,7 @@ const Login = () => {
     <div>
       {step === 1 ? (
         <Email
-          username={formData.username}
+          email={formData.email}
           handleChange={handleChange}
           handleEmailSubmit={handleEmailSubmit}
         />

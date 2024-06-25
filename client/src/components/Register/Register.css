@@ -3,6 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .register-form {
@@ -31,6 +32,7 @@
 
 .input-container {
   position: relative;
+  width: 100%;
 }
 
 .input-container label {

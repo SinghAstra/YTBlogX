@@ -1,0 +1,66 @@
+.email-login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.email-login-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+  padding: 10px 30px;
+  color: var(--text-color);
+  gap: 25px;
+}
+
+.email-login-form h1 {
+  text-align: center;
+  font-size: 36px;
+  color: var(--primary-color);
+  font-weight: 500;
+  width: 100%;
+}
+
+.email-login-avatar-container {
+  background-color: var(--primary-light-color);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.email-login-avatar-container .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  padding: 2px;
+  object-fit: cover;
+}
+
+.email-login-form .btn-submit {
+  width: 100%;
+  background: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 40px;
+  height: 45px;
+  font-weight: 500;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 20px;
+  border: none;
+}
+
+.email-login-form .btn-submit:hover {
+  background: var(--primary-light-color);
+}
+
+@media (min-width: 768px) {
+  .email-login-form {
+    width: 420px;
+  }
+}
