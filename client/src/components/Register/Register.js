@@ -69,7 +69,7 @@ const Register = () => {
   };
 
   const validateLastName = (lastName) => {
-    const nameRegex = /^[A-Za-z]{2,}$/;
+    const nameRegex = /^[A-Za-z\s]{2,}$/;
     if (!lastName || !nameRegex.test(lastName)) {
       toast.error("Invalid Last Name");
       return false;

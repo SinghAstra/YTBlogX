@@ -10,6 +10,7 @@ import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import Register from "./components/Register/Register";
+import VerifyOTP from "./components/VerifyOTP/VerifyOTP";
 import { AuthContext } from "./context/AuthContext";
 import Home from "./pages/Home/Home";
 import Profile from "./pages/Profile/Profile";
@@ -26,7 +27,7 @@ function App() {
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* <Route path="/recovery" element={<Recovery />} /> */}
+        <Route path="/verify" element={<VerifyOTP />} />
         {/* <Route path="/reset" element={<Reset />} /> */}
       </Route>
       <Route element={<PrivateRoute />}>
