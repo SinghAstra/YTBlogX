@@ -5,6 +5,7 @@ import {
   fetchUserInfoUsingJWTToken,
   loginController,
   registerController,
+  resetPasswordController,
   sendOTPController,
   verifyOTPController,
 } from "../controllers/authController.js";
@@ -16,6 +17,7 @@ router.post("/login", loginController);
 router.post("/fetchUserInfo", fetchUserInfoUsingEmail);
 router.post("/sendOTP", sendOTPController);
 router.post("/verifyOTP", verifyOTPController);
+router.post("/resetPassword", resetPasswordController);
 
 router.get("/", authMiddleware, fetchUserInfoUsingJWTToken);
 
