@@ -39,6 +39,10 @@ const UserSchema = new mongoose.Schema(
     impressions: Number,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    isOtpVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

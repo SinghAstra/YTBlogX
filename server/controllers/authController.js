@@ -77,8 +77,6 @@ export const fetchUserInfoUsingEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
-    console.log("email is ", email);
-
     // Check if email is provided in the request body
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
@@ -90,8 +88,6 @@ export const fetchUserInfoUsingEmail = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("user is ", user);
-
     // Extract non-sensitive user data to return
     const { password, ...nonSensitiveUserData } = user.toObject(); // Convert Mongoose document to plain JS object
 
@@ -100,7 +96,6 @@ export const fetchUserInfoUsingEmail = async (req, res) => {
       message: "User Info fetched successfully",
     });
   } catch (error) {
-    console.log("error is ", error);
     res.status(500).json({ message: "Error while fetching user info." });
   }
 };
@@ -179,5 +174,39 @@ export const sendOTPController = async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save();
     res.status(500).json({ message: "Error sending email" });
+  }
+};
+
+export const verifyOTPController = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+
+    if (
+      hashedOtp !== user.resetPasswordToken ||
+      Date.now() > user.resetPasswordExpire
+    ) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    user.isOtpVerified = true;
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified" });
+  } catch (error) {
+    res.status(500).json({ message: "Error verifying OTP" });
   }
 };
