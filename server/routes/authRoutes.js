@@ -5,6 +5,7 @@ import {
   fetchUserInfoUsingJWTToken,
   loginController,
   registerController,
+  sendOTPController,
 } from "../controllers/authController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 router.post("/register", upload.single("picture"), registerController);
 router.post("/login", loginController);
 router.post("/fetchUserInfo", fetchUserInfoUsingEmail);
+router.post("/sendOTP", sendOTPController);
 
 router.get("/", authMiddleware, fetchUserInfoUsingJWTToken);
 
