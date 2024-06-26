@@ -125,6 +125,7 @@
 .bottom-link {
   text-decoration: none;
   color: var(--primary-light-color);
+  cursor: pointer;
 }
 
 .bottom-link:hover {

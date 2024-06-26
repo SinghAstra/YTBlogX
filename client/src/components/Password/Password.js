@@ -1,8 +1,9 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import user from "../../assets/user.png";
+import { AuthContext } from "../../context/AuthContext";
 import "./Password.css";
 
 const Password = ({
@@ -13,6 +14,8 @@ const Password = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [shouldNavigate, setShouldNavigate] = useState(false);
+  const { handleSendOTP } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +29,7 @@ const Password = ({
   }, [shouldNavigate, navigate, userInfo]);
 
   const handleResetPasswordClick = () => {
+    handleSendOTP(userInfo.email);
     setShouldNavigate(true);
   };
 

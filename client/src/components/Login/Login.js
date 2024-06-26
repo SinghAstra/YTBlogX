@@ -8,7 +8,7 @@ import Password from "../Password/Password";
 const Login = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    email: "mrrobot@gmail.com",
+    email: "abhaypratapsinghwd@gmail.com",
     password: "",
   });
   const [userInfo, setUserInfo] = useState({});
@@ -86,7 +86,6 @@ const Login = () => {
             password,
           }
         );
-        console.log("response: ", response);
         saveJWTToken(response.data.token);
         toast.success(response.data.message);
       } catch (error) {

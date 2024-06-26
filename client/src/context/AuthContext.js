@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -51,6 +52,24 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
+  const handleSendOTP = async (email) => {
+    const toastId = toast.loading("Sending email...");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/sendOTP",
+        {
+          email,
+        }
+      );
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.log("error is ", error);
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -61,6 +80,7 @@ const AuthProvider = ({ children }) => {
         setIsAuthenticating,
         saveJWTToken,
         handleLogOut,
+        handleSendOTP,
       }}
     >
       {children}
