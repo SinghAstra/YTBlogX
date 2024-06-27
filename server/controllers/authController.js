@@ -1,8 +1,14 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import fs from "fs";
 import jwt from "jsonwebtoken";
+import path from "path";
+import { fileURLToPath } from "url";
+import userAgentParser from "user-agent-parser";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const registerController = async (req, res) => {
   try {
@@ -159,17 +165,37 @@ export const sendOTPController = async (req, res) => {
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    // Send email
-    const message = `You are receiving this email because you (or someone else) has requested a password reset. Your OTP is: ${otp}`;
+    const userAgentString = req.headers["user-agent"];
+    const parsedUserAgent = userAgentParser(userAgentString);
 
+    const browser =
+      parsedUserAgent.browser.name + " " + parsedUserAgent.browser.version;
+    const os = parsedUserAgent.os.name + " " + parsedUserAgent.os.version;
+
+    const templatePath = path.resolve(
+      __dirname,
+      "../email-templates/resetPassword.html"
+    );
+    let html = fs.readFileSync(templatePath, "utf8");
+
+    html = html.replace(/{{username}}/g, user.firstName);
+    html = html.replace(/{{OTP}}/g, otp);
+    html = html.replace(/{{operatingSystem}}/g, os);
+    html = html.replace(/{{browser}}/g, browser);
+
+    console.log("html is ", html);
+
+    // Send email
     await sendEmail({
       email: user.email,
       subject: "Password Reset Request",
-      message,
+      html: html,
     });
 
     res.status(200).json({ message: "Email sent" });
   } catch (error) {
+    console.log("error is ", error);
+    console.log("error.message is ", error.message);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
@@ -242,4 +268,17 @@ export const resetPasswordController = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error resetting password" });
   }
+};
+
+export const testController = (req, res) => {
+  console.log(`Browser: ${browser}, OS: ${os}`);
+  console.log("__dirname is ", __dirname);
+
+  const templatePath = path.resolve(
+    __dirname,
+    "../email-templates/resetPasswordTemplate.html"
+  );
+
+  console.log("templatePath is ", templatePath);
+  res.json({ message: "SocialNet Server is running." });
 };

@@ -8,6 +8,7 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import { testController } from "./controllers/authController.js";
 import authRoutes from "./routes/authRoutes.js";
 
 // Absolute path of the current file and its directory
@@ -38,9 +39,7 @@ connectDB();
 
 app.use("/api/auth", authRoutes);
 
-app.get("/", (req, res) => {
-  res.json({ message: "SocialNet Server is running." });
-});
+app.get("/", testController);
 
 app.listen(5000, (req, res) => {
   console.log("Server is running on port 5000");
