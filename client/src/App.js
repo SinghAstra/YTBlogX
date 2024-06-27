@@ -30,10 +30,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<VerifyOTP />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
-        <Route path="profile" element={<Profile />} />
       </Route>
       {/* <Route path="*" element={<NotFound />} /> */}
     </>

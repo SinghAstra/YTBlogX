@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import user from "../../assets/user.png";
 import "./ResetPassword.css";
 
@@ -13,30 +13,15 @@ const ResetPassword = () => {
     password: "",
     confirmPassword: "",
   });
-
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // if (!location.state) {
-  //   return <Navigate to="/login" />;
-  // }
+  if (!location.state) {
+    return <Navigate to="/login" />;
+  }
 
-  // const { userInfo } = location.state;
-
-  const userInfo = {
-    _id: "667b8a3d7b39302779667216",
-    firstName: "Abhay",
-    lastName: "Pratap Singh",
-    email: "abhaypratapsinghwd@gmail.com",
-    picturePath: "public\\assets\\mr-robot-hoodie.jpg",
-    friends: [],
-    viewedProfile: 1005,
-    impressions: 2395,
-    createdAt: "2024-06-26T03:25:49.722Z",
-    updatedAt: "2024-06-26T06:01:12.264Z",
-    __v: 0,
-    isOtpVerified: true,
-  };
+  const { userInfo } = location.state;
 
   const avatarSrc = userInfo.picturePath
     ? `http://localhost:5000/assets/${userInfo.picturePath
@@ -102,13 +87,14 @@ const ResetPassword = () => {
     if (validatePassword()) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/user/resetPassword",
+          "http://localhost:5000/api/auth/resetPassword",
           {
             email: userInfo.email,
             newPassword: formData.password,
           }
         );
         toast.success(response.data.message);
+        navigate("/login");
       } catch (error) {
         toast.error(error.response.data.message);
       }
@@ -192,7 +178,7 @@ const ResetPassword = () => {
             />
             <label htmlFor="confirmPassword">Confirm Password</label>
             <FontAwesomeIcon
-              icon={showPassword ? faEyeSlash : faEye}
+              icon={showConfirmPassword ? faEyeSlash : faEye}
               className="input-icon"
               onClick={toggleConfirmPasswordVisibility}
             />

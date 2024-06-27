@@ -1,0 +1,40 @@
+.profile-container {
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.profile-banner-label-container {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.profile-banner {
+  cursor: pointer;
+  opacity: 0.7;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: all 0.3s;
+}
+
+.profile-banner:hover {
+  opacity: 0.5;
+  transform: scale(1.05);
+}
+
+.banner-upload-input {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .profile-banner-label-container {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-banner-label-container {
+    height: 150px;
+  }
+}

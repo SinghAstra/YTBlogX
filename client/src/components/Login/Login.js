@@ -8,7 +8,7 @@ import Password from "../Password/Password";
 const Login = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    email: "abhaypratapsinghwd@gmail.com",
+    email: "",
     password: "",
   });
   const [userInfo, setUserInfo] = useState({});
