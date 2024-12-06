@@ -16,8 +16,7 @@ Generate professional blog posts from YouTube video content automatically using 
 
 - **Frontend**: Next.js
 - **AI**: OpenAI/Claude API
-- **Services**: 
+- **Services**:
   - YouTube Data API
   - Speech-to-Text
   - Natural Language Processing
-
