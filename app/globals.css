@@ -47,11 +47,14 @@
     /* Radius */
     --radius: 0.875rem;
 
-    /* Stats Card Variants*/
-    --stats-blue: 214 95% 65%;
-    --stats-purple: 277 84% 47%;
-    --stats-orange: 0 84% 60%;
-    --stats-green: 142 61% 45%;
+    --stats-blue: 210 40% 50%; /* Vibrant blue */
+    --stats-purple: 270 50% 50%; /* Deep purple */
+    --stats-pink: 330 60% 50%; /* Bright pink */
+    --stats-teal: 180 50% 40%; /* Teal green */
+    --stats-orange: 25 90% 50%; /* Warm orange */
+
+    --stats-green: 120 50% 40%; /* Verdant green */
+    --stats-red: 0 70% 50%;
   }
 }
 
@@ -106,4 +109,22 @@ input:-webkit-autofill:active {
 input:-webkit-autofill:not(:focus) {
   -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
   -webkit-text-fill-color: hsl(var(--foreground)) !important;
+}
+
+.animate-gradient {
+  background-size: 300%;
+  -webkit-animation: animated-gradient 6s ease infinite alternate;
+  animation: animated-gradient 6s ease infinite alternate;
+}
+
+@keyframes animated-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
