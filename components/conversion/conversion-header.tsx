@@ -1,6 +1,5 @@
 "use client";
 
-import { Progress } from "@/components/ui/progress";
 import { VideoIcon } from "lucide-react";
 
 export function ConversionHeader() {
@@ -18,7 +17,6 @@ export function ConversionHeader() {
             </span>
           </div>
         </div>
-        <Progress value={33} className="mt-4 h-1 bg-secondary" />
       </div>
     </header>
   );
