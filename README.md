@@ -2,15 +2,7 @@
 
 ## 🌟 Project Overview
 
-Generate professional blog posts from YouTube video content automatically using cutting-edge AI technology. Transform video insights into readable, structured written content with just a URL.
-
-## ✨ Features
-
-- 🔗 Simple YouTube URL input
-- 🤖 AI-powered content generation
-- 📝 Automatic blog post creation
-- 🌐 Multi-language support
-- 📊 Metadata extraction
+Helping developers learn code without watching long YouTube videos by converting videos to blogs
 
 ## 🛠 Tech Stack
 

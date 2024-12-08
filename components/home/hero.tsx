@@ -1,6 +1,10 @@
 "use client";
 
-import { UrlInput } from "./url-input";
+import { siteConfig } from "@/config/site";
+import { Video } from "lucide-react";
+import Link from "next/link";
+import { Icons } from "../Icons";
+import { buttonVariants } from "../ui/button";
 
 export function Hero() {
   return (
@@ -20,7 +24,28 @@ export function Hero() {
           technology. Just paste a URL and let our tool do the rest.
         </p>
       </div>
-      <UrlInput />
+      <div className="flex gap-4">
+        <Link
+          href="/convert/new"
+          className={buttonVariants({
+            variant: "default",
+            size: "lg",
+          })}
+        >
+          <Video className="mr-2" /> Get Started
+        </Link>
+        <Link
+          href={siteConfig.links.github}
+          target="_blank"
+          className={buttonVariants({
+            variant: "outline",
+            size: "lg",
+            className: "flex gap-2 items-center border-gray-600 ",
+          })}
+        >
+          <Icons.gitLogo className="mr-2" /> Github
+        </Link>
+      </div>
     </div>
   );
 }
