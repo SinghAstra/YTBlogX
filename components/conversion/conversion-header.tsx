@@ -10,11 +10,6 @@ export function ConversionHeader() {
             <VideoIcon className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">YTBlogX</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              Step 1 of 3: Video Details
-            </span>
-          </div>
         </div>
       </div>
     </header>

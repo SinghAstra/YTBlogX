@@ -7,7 +7,7 @@ Helping developers learn code without watching long YouTube videos by converting
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js
-- **AI**: OpenAI/Claude API
+- **AI**: Gemini API
 - **Services**:
   - YouTube Data API
   - Speech-to-Text
