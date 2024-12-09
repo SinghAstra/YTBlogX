@@ -1,3 +1,5 @@
+"use server";
+
 import { getJob } from "@/app/actions/job";
 import { JobErrorType } from "../jobs/job-status";
 import { redis } from "../redis";
@@ -18,6 +20,7 @@ function determineErrorType(error: unknown): JobErrorType {
 }
 
 async function processNextJob() {
+  console.log("In the processNextJob.");
   const jobId: string | null = await redis.lpop("conversion:queue");
 
   if (!jobId) {
@@ -46,6 +49,8 @@ async function processNextJob() {
     // Extract transcript
     const transcript = await extractYouTubeTranscript(jobData.metadata.id);
 
+    console.log("transcript is ", transcript);
+
     // Update status to AI processing
     await updateJobInRedis(jobId, {
       status: "AI_PROCESSING",
@@ -53,6 +58,8 @@ async function processNextJob() {
 
     // Generate blog content
     const blogContent = await generateBlogContent(transcript);
+
+    console.log("blogContent is ", blogContent);
 
     // Mark job as completed
     await updateJobInRedis(jobId, {

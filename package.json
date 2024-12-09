@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start:worker": "tsx scripts/start-worker",
+    "dev:all": "concurrently \"npm run dev\" \"npm run start:worker\""
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
@@ -23,25 +25,31 @@
     "@upstash/redis": "^1.34.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
     "framer-motion": "^11.13.1",
+    "googleapis": "^144.0.0",
     "lucide-react": "^0.468.0",
     "next": "15.0.4",
     "nextjs-toploader": "^3.7.15",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "openai": "^4.76.0",
     "react-icons": "^5.4.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.19.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/node": "^20.17.9",
+    "@types/react": "^18.3.14",
+    "@types/react-dom": "^18.3.2",
+    "concurrently": "^9.1.0",
     "eslint": "^8",
     "eslint-config-next": "15.0.4",
     "postcss": "^8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
   }
 }

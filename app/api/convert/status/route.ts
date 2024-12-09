@@ -1,8 +1,6 @@
 import { JobErrorType } from "@/lib/jobs/job-status";
+import { redis } from "@/lib/redis";
 import { NextRequest, NextResponse } from "next/server";
-
-// TODO: Replace with actual job tracking mechanism
-const jobStatuses = new Map();
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -18,18 +16,27 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const jobStatus = jobStatuses.get(jobId);
+    // Retrieve job data from Redis
+    const jobData = await redis.hgetall(`job:${jobId}`);
 
-    if (!jobStatus) {
+    if (!jobData || Object.keys(jobData).length === 0) {
       return NextResponse.json(
         {
-          error: JobErrorType.UNKNOWN_ERROR,
+          error: "Job Not Found --api/convert/status",
         },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(jobStatus);
+    // Prepare response
+    const response = {
+      jobId: jobData.id,
+      status: jobData.status,
+      videoUrl: jobData.videoUrl,
+      createdAt: jobData.createdAt,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Failed to retrieve job status:", error);
 

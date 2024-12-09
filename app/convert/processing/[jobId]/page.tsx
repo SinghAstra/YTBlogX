@@ -1,14 +1,11 @@
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-interface JobStatusProps {
-  jobId: string;
-}
-
-export default function JobStatusPoller({ jobId }: JobStatusProps) {
+export default function JobStatusPoller() {
+  const { jobId } = useParams();
   const [status, setStatus] = useState<string>("PENDING");
   const [progress, setProgress] = useState<number>(0);
   const router = useRouter();
