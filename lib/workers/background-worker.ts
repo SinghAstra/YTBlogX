@@ -3,6 +3,7 @@
 import { getJob } from "@/app/actions/job";
 import { JobErrorType } from "../jobs/job-status";
 import { redis } from "../redis";
+import { extractVideoId } from "../youtube";
 import { generateBlogContent } from "./ai-processor";
 import { updateJobInRedis } from "./job-utils";
 import { extractYouTubeTranscript } from "./transcript-extractor";
@@ -22,15 +23,19 @@ function determineErrorType(error: unknown): JobErrorType {
 async function processNextJob() {
   console.log("In the processNextJob.");
   const jobId: string | null = await redis.lpop("conversion:queue");
-
+  console.log("jobId is ", jobId);
   if (!jobId) {
     console.log("No jobs in queue");
     return;
   }
 
   try {
+    console.log("In the try block of background-worker");
     // Fetch job details
     const jobData = await getJob(jobId);
+
+    console.log("jobId --background-worker is ", jobId);
+    console.log("jobData --background-worker is ", jobData);
 
     if (!jobData) {
       console.error(`Job ${jobId} not found`);
@@ -46,8 +51,12 @@ async function processNextJob() {
       return;
     }
 
+    console.log("Before Transcript");
+
+    const videoId = extractVideoId(jobData.videoUrl);
+
     // Extract transcript
-    const transcript = await extractYouTubeTranscript(jobData.metadata.id);
+    const transcript = await extractYouTubeTranscript(videoId!);
 
     console.log("transcript is ", transcript);
 

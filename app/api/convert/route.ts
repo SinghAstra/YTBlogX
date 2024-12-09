@@ -17,18 +17,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { videoUrl } = ConversionRequestSchema.parse(body);
 
+    console.log("videoUrl --/api/convert is ", videoUrl);
+
     // 2. Create initial conversion job
     const job = createConversionJob(videoUrl);
+    console.log("job --/api/convert is ", job);
 
     // 3. Fetch initial video metadata to validate and enrich job
     try {
       const videoId = extractVideoId(videoUrl);
+      console.log("videoId --/api/convert is ", videoId);
+
       if (!videoId) {
         throw new Error("Invalid YouTube URL");
       }
 
       // Fetch metadata to ensure video exists and get additional details
       const metadata = await fetchVideoMetadata(videoId);
+
+      console.log("metadata --/api/convert is ", metadata);
 
       // Update job with metadata
       job.metadata = metadata;
@@ -48,6 +55,8 @@ export async function POST(request: NextRequest) {
       metadata: JSON.stringify(job.metadata || {}),
     };
 
+    console.log("jobData --/api/convert is ", jobData);
+
     // 4. Add job to queue for processing
     await redis.hset(`job:${job.id}`, jobData);
 
@@ -59,7 +68,6 @@ export async function POST(request: NextRequest) {
       {
         jobId: job.id,
         status: job.status,
-        // Optionally return safe metadata
         videoTitle: job.metadata?.title,
         videoThumbnail: job.metadata?.thumbnail,
       },

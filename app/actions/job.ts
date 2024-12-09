@@ -18,7 +18,9 @@ interface ConversionJob {
 }
 
 export async function getJob(jobId: string): Promise<ConversionJob | null> {
+  console.log("jobId --getJob is ", jobId);
   const jobData = await redis.hgetall(`job:${jobId}`);
+  console.log("jobData --getJob is ", jobData);
 
   if (!jobData) return null;
 
@@ -28,7 +30,7 @@ export async function getJob(jobId: string): Promise<ConversionJob | null> {
     status: jobData.status as JobStatus,
     createdAt: jobData.createdAt as string,
     metadata: jobData.metadata
-      ? JSON.parse(jobData.metadata as string)
+      ? (jobData.metadata as VideoMetadata)
       : undefined,
     errorType: jobData.errorType as JobErrorType | undefined,
   };
