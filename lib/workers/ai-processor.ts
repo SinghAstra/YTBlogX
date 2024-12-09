@@ -1,59 +1,36 @@
-import OpenAI from "openai";
-
-console.log("process.env.OPENAI_API_KEY is ", process.env.OPENAI_API_KEY);
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateBlogContent(transcript: string): Promise<{
   title: string;
   content: string;
   summary: string;
 }> {
+  // Initialize Gemini API
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
   try {
-    // Generate blog content using OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert content converter. 
-          Convert the following YouTube video transcript into a well-structured, 
-          engaging blog post. Include:
-          - A catchy title
-          - Clear sections with headings
-          - Key takeaways
-          - Conversational yet informative tone`,
-        },
-        {
-          role: "user",
-          content: `Convert this transcript into a blog post:
-          ${transcript}`,
-        },
-      ],
-      max_tokens: 1500,
-    });
+    // Generate blog content
+    const contentPrompt = `You are an expert content converter. 
+    Convert the following YouTube video transcript into a well-structured, 
+    engaging blog post. Include:
+    - A catchy title
+    - Clear sections with headings
+    - Key takeaways
+    - Conversational yet informative tone
 
-    const generatedContent = response.choices[0].message.content || "";
+    Transcript to convert:
+    ${transcript}`;
 
-    // Generate a summary
-    const summaryResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "Generate a concise 2-3 sentence summary of the blog post.",
-        },
-        {
-          role: "user",
-          content: generatedContent,
-        },
-      ],
-      max_tokens: 100,
-    });
+    const contentResponse = await model.generateContent(contentPrompt);
+    const generatedContent = contentResponse.response.text() || "";
 
-    const summary = summaryResponse.choices[0].message.content || "";
+    // Generate summary
+    const summaryPrompt = `Generate a concise 2-3 sentence summary of this blog post:
+    ${generatedContent}`;
+
+    const summaryResponse = await model.generateContent(summaryPrompt);
+    const summary = summaryResponse.response.text() || "";
 
     // Extract title (first line of generated content)
     const title = generatedContent.split("\n")[0].replace(/^#\s*/, "");
