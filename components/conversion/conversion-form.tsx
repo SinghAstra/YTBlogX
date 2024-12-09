@@ -4,14 +4,24 @@ import { ConversionOptions } from "@/components/conversion/conversion-options";
 import { VideoPreview } from "@/components/conversion/video-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { CheckCircle, ClipboardIcon, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  ClipboardIcon,
+  LoaderCircle,
+  XCircle,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function ConversionForm() {
   const [url, setUrl] = useState("");
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const validateYouTubeUrl = (url: string) => {
     const regex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
@@ -31,6 +41,41 @@ export function ConversionForm() {
       handleUrlChange(text);
     } catch (err) {
       console.error("Failed to read clipboard:", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/convert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ videoUrl: url }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Redirect to processing page with job ID
+        router.push(`/convert/processing/${data.jobId}`);
+      } else {
+        toast({
+          title: "Error while Conversion",
+          description: "Conversion failed",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error while Conversion",
+        description: "Conversion failed",
+      });
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,8 +137,19 @@ export function ConversionForm() {
             <VideoPreview url={url} />
             <ConversionOptions />
             <div className="flex justify-center">
-              <Button size="lg" className="w-full max-w-sm">
-                Start Conversion
+              <Button
+                size="lg"
+                className="w-full max-w-sm"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <LoaderCircle className="animate-spin mr-2" /> Wait....
+                  </>
+                ) : (
+                  "Start Conversion"
+                )}
               </Button>
             </div>
           </div>

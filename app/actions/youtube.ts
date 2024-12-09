@@ -1,6 +1,6 @@
 "use server";
 
-export async function fetchVideoDetails(videoId: string) {
+export async function fetchVideoMetadata(videoId: string) {
   if (!videoId) {
     throw new Error("Video ID required");
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchVideoDetails } from "@/app/actions/youtube";
+import { fetchVideoMetadata } from "@/app/actions/youtube";
 import { Card } from "@/components/ui/card";
 import { extractVideoId, formatDuration, formatViewCount } from "@/lib/youtube";
 import { Clock, ExternalLink, Eye } from "lucide-react";
@@ -38,7 +38,7 @@ export function VideoPreview({ url }: VideoPreviewProps) {
           throw new Error("Invalid YouTube URL");
         }
 
-        const data = await fetchVideoDetails(videoId);
+        const data = await fetchVideoMetadata(videoId);
 
         if (!data.items?.length) {
           throw new Error("Video not found");
