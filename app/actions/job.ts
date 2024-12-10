@@ -13,7 +13,7 @@ export async function getJob(jobId: string): Promise<Job | null> {
     id: jobData.id as string,
     videoUrl: jobData.videoUrl as string,
     status: jobData.status as JobStatus,
-    createdAt: jobData.createdAt as string,
+    createdAt: jobData.createdAt as Date,
     metadata: jobData.metadata
       ? (jobData.metadata as VideoMetadata)
       : undefined,
