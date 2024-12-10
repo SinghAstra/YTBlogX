@@ -31,6 +31,6 @@ export interface Job {
   metadata?: VideoMetadata;
   result?: JobResult;
   errorType?: JobErrorType;
-  createdAt: string | Date;
-  updatedAt?: string | Date;
+  createdAt: Date;
+  updatedAt?: Date;
 }
