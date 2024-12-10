@@ -20,7 +20,7 @@ function determineErrorType(error: unknown): JobErrorType {
   return JobErrorType.UNKNOWN_ERROR;
 }
 
-async function processNextJob() {
+export async function processNextJob() {
   console.log("In the processNextJob.");
   const jobId: string | null = await redis.lpop("conversion:queue");
   console.log("jobId is ", jobId);
@@ -75,6 +75,8 @@ async function processNextJob() {
       status: "COMPLETED",
       result: JSON.stringify(blogContent),
     });
+
+    return { jobId, status: "COMPLETED" };
   } catch (error) {
     console.error("Job processing failed:", error);
     // Mark job as failed
@@ -82,10 +84,11 @@ async function processNextJob() {
       status: "FAILED",
       errorType: determineErrorType(error),
     });
+
+    return { jobId, status: "FAILED", error };
   }
 }
 
-// Run worker continuously
 export async function startWorker() {
   console.log("Background worker started");
   while (true) {
