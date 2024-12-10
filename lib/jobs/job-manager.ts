@@ -1,12 +1,12 @@
 import { VideoMetadata } from "../youtube/types";
 import { validateYouTubeUrl } from "../youtube/validation";
-import { ConversionJob, JobErrorType, JobStatus } from "./job-status";
+import { Job, JobErrorType, JobStatus } from "./job-status";
 
 export function generateUniqueJobId(): string {
   return `job_${Date.now()}_${Math.random().toString(36)}`;
 }
 
-export function createConversionJob(videoUrl: string): ConversionJob {
+export function createConversionJob(videoUrl: string): Job {
   if (!validateYouTubeUrl(videoUrl)) {
     throw new Error(JobErrorType.INVALID_URL);
   }
@@ -21,11 +21,11 @@ export function createConversionJob(videoUrl: string): ConversionJob {
 }
 
 export function updateJobStatus(
-  job: ConversionJob,
+  job: Job,
   status: JobStatus,
   metadata?: VideoMetadata,
   errorType?: JobErrorType
-): ConversionJob {
+): Job {
   return {
     ...job,
     status,
