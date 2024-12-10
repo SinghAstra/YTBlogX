@@ -18,12 +18,19 @@ export enum JobErrorType {
   UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
-export interface ConversionJob {
+export interface JobResult {
+  title: string;
+  content: string;
+  summary: string;
+}
+
+export interface Job {
   id: string;
-  videoUrl: string;
   status: JobStatus;
+  videoUrl: string;
   metadata?: VideoMetadata;
+  result?: JobResult;
   errorType?: JobErrorType;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt?: string;
 }

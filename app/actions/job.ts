@@ -1,23 +1,8 @@
-import { JobErrorType, JobStatus } from "@/lib/jobs/job-status";
+import { Job, JobErrorType, JobResult, JobStatus } from "@/lib/jobs/job-status";
 import { redis } from "@/lib/redis";
+import { VideoMetadata } from "@/lib/youtube/types";
 
-interface VideoMetadata {
-  id: string;
-  title: string;
-  thumbnail: string;
-}
-
-// Define the full job structure
-interface ConversionJob {
-  id: string;
-  videoUrl: string;
-  status: JobStatus;
-  createdAt: string;
-  metadata?: VideoMetadata;
-  errorType?: JobErrorType;
-}
-
-export async function getJob(jobId: string): Promise<ConversionJob | null> {
+export async function getJob(jobId: string): Promise<Job | null> {
   console.log("jobId --getJob is ", jobId);
   const jobData = await redis.hgetall(`job:${jobId}`);
   console.log("jobData --getJob is ", jobData);
@@ -33,5 +18,6 @@ export async function getJob(jobId: string): Promise<ConversionJob | null> {
       ? (jobData.metadata as VideoMetadata)
       : undefined,
     errorType: jobData.errorType as JobErrorType | undefined,
+    result: jobData.result ? (jobData.result as JobResult) : undefined,
   };
 }
