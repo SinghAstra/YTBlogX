@@ -1,8 +1,10 @@
 "use server";
 
 export async function fetchVideoMetadata(videoId: string) {
+  console.log("In fetchVideoMetaData");
   if (!videoId) {
-    throw new Error("Video ID required");
+    console.log("Video Id is required --fetchVideoMetadata");
+    return;
   }
 
   const response = await fetch(

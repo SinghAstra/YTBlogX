@@ -10,14 +10,11 @@ export const YouTubeUrlSchema = z.string().refine(
   { message: "Invalid YouTube URL" }
 );
 
-// Video Metadata Schema
-export const VideoMetadataSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  channelTitle: z.string(),
-  thumbnail: z.string(),
-  duration: z.string(),
-  description: z.string().optional(),
-});
-
-export type VideoMetadata = z.infer<typeof VideoMetadataSchema>;
+export interface VideoMetaData {
+  id?: string;
+  title?: string;
+  channelTitle?: string;
+  thumbnail?: string;
+  duration?: string;
+  description?: string;
+}

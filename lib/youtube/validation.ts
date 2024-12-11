@@ -1,4 +1,4 @@
-import { YouTubeUrlSchema } from "./types";
+import { YouTubeUrlSchema } from "../../types/youtube";
 
 export function validateYouTubeUrl(url: string): boolean {
   try {

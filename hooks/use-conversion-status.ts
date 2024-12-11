@@ -1,10 +1,13 @@
 "use client";
 
-import { ConversionStatus } from "@/types/conversion";
+import { ConversionStatus, ConversionStatusData } from "@/types/conversion";
 import { useEffect, useState } from "react";
 
-export function useConversionStatus(conversionId: string) {
-  const [status, setStatus] = useState<ConversionStatus | null>(null);
+export function useConversionStatus(
+  conversionId: string
+): ConversionStatusData | null {
+  const [conversionStatusData, setConversionStatusData] =
+    useState<ConversionStatusData | null>(null);
 
   useEffect(() => {
     if (!conversionId) return;
@@ -14,8 +17,8 @@ export function useConversionStatus(conversionId: string) {
     );
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setStatus(data.status);
+      const data: ConversionStatusData = JSON.parse(event.data);
+      setConversionStatusData(data);
 
       // Close connection if completed or failed
       if (
@@ -27,7 +30,10 @@ export function useConversionStatus(conversionId: string) {
     };
 
     eventSource.onerror = () => {
-      setStatus(ConversionStatus.FAILED);
+      setConversionStatusData({
+        conversionId,
+        status: ConversionStatus.FAILED,
+      });
       eventSource.close();
     };
 
@@ -36,5 +42,9 @@ export function useConversionStatus(conversionId: string) {
     };
   }, [conversionId]);
 
-  return status;
+  if (!conversionStatusData) {
+    return null;
+  }
+
+  return conversionStatusData;
 }

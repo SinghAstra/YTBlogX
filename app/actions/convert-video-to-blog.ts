@@ -1,13 +1,12 @@
 "use server";
 
 import { generateBlogContent } from "@/lib/ai-processor";
+import { conversionsMap } from "@/lib/conversion-store";
 import { extractYouTubeTranscript } from "@/lib/transcript-extractor";
 import { extractVideoId, generateUniqueIdFromUrl } from "@/lib/youtube/utils";
 import { validateYouTubeUrl } from "@/lib/youtube/validation";
-import { ConversionStatus, ConversionStatusData } from "@/types/conversion";
+import { ConversionStatus } from "@/types/conversion";
 import { fetchVideoMetadata } from "./youtube";
-
-export const conversionsMap = new Map<string, ConversionStatusData>();
 
 export async function initiateConversion(videoUrl: string) {
   // Validate URL

@@ -1,4 +1,5 @@
 import { BlogContent } from "./blog";
+import { VideoMetaData } from "./youtube";
 
 export enum ConversionStatus {
   PENDING = "PENDING",
@@ -13,11 +14,7 @@ export interface ConversionStatusData {
   status: ConversionStatus;
   conversionId: string;
   result?: {
-    metadata: {
-      title: string;
-      thumbnail: string;
-      description: string;
-    };
+    metadata: VideoMetaData;
     blogContent: BlogContent;
   };
 }

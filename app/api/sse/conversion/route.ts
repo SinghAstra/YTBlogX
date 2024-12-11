@@ -1,4 +1,4 @@
-import { conversionsMap } from "@/app/actions/convert-video-to-blog";
+import { conversionsMap } from "@/lib/conversion-store";
 import { ConversionStatus, ConversionStatusData } from "@/types/conversion";
 import { NextRequest } from "next/server";
 

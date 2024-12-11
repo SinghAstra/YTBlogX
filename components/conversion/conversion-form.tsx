@@ -1,7 +1,7 @@
 "use client";
 
 import { initiateConversion } from "@/app/actions/convert-video-to-blog";
-import { VideoPreview } from "@/components/conversion/video-preview";
+// import { VideoPreview } from "@/components/conversion/video-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { ClipboardIcon, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { VideoPreview } from "./video-preview";
 
 export function ConversionForm() {
   const [url, setUrl] = useState("");

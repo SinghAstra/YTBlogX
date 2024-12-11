@@ -2,7 +2,11 @@
 
 import { fetchVideoMetadata } from "@/app/actions/youtube";
 import { Card } from "@/components/ui/card";
-import { extractVideoId, formatDuration, formatViewCount } from "@/lib/youtube";
+import {
+  extractVideoId,
+  formatDuration,
+  formatViewCount,
+} from "@/lib/youtube/utils";
 import { Clock, ExternalLink, Eye } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -81,7 +85,7 @@ export function VideoPreview({ url }: VideoPreviewProps) {
     return <VideoPreviewSkeleton />;
   }
 
-  if (!videoDetails) return null;
+  if (!videoDetails) return <h1>Building...</h1>;
 
   return (
     <Card className="overflow-hidden bg-gradient-to-br from-card/50 via-card/30 to-card/50 backdrop-blur-sm border-border/50">

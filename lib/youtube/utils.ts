@@ -11,6 +11,8 @@ export async function generateUniqueIdFromUrl(videoUrl: string) {
   // Extract video metadata from YouTube API
   const metadata = await fetchVideoMetadata(videoId);
 
+  console.log("metadata --generateUniqueIdFromUrl is ", metadata);
+
   // Remove special characters and convert to lowercase
   const sanitizeString = (str: string) =>
     str
