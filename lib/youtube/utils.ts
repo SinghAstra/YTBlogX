@@ -1,7 +1,10 @@
 import { fetchVideoMetadata } from "@/app/actions/youtube";
 
 export async function generateUniqueIdFromUrl(videoUrl: string) {
+  console.log("videoUrl is ", videoUrl);
   const videoId = extractVideoId(videoUrl);
+
+  console.log("videoId is ", videoId);
 
   if (!videoId) {
     console.log("videoId not found --generateUniqueIdFromVideoUrl");
@@ -9,9 +12,10 @@ export async function generateUniqueIdFromUrl(videoUrl: string) {
   }
 
   // Extract video metadata from YouTube API
-  const metadata = await fetchVideoMetadata(videoId);
+  const { videoTitle, channelTitle } = await fetchVideoMetadata(videoId);
 
-  console.log("metadata --generateUniqueIdFromUrl is ", metadata);
+  console.log("videoTitle is ", videoTitle);
+  console.log("channelTitle is ", channelTitle);
 
   // Remove special characters and convert to lowercase
   const sanitizeString = (str: string) =>
@@ -22,8 +26,8 @@ export async function generateUniqueIdFromUrl(videoUrl: string) {
       .substring(0, 30);
 
   // Create slug-like components
-  const titleSlug = sanitizeString(metadata.title);
-  const channelSlug = sanitizeString(metadata.channelTitle);
+  const titleSlug = sanitizeString(videoTitle ?? "Unknown Video Title");
+  const channelSlug = sanitizeString(channelTitle ?? "Unknown Channel Title");
 
   // Generate a short random component
   const randomPart = Math.random().toString(36).substring(2, 6);
@@ -40,6 +44,7 @@ export function extractVideoId(url: string): string | null {
 
   for (const pattern of patterns) {
     const match = url.match(pattern);
+    console.log("match is ", match);
     if (match) return match[1];
   }
   return null;

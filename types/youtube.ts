@@ -11,10 +11,12 @@ export const YouTubeUrlSchema = z.string().refine(
 );
 
 export interface VideoMetaData {
-  id?: string;
-  title?: string;
-  channelTitle?: string;
+  channelId?: string;
+  videoTitle?: string;
+  videoDescription?: string;
   thumbnail?: string;
-  duration?: string;
-  description?: string;
+  channelTitle?: string;
+  videoDuration?: string;
+  viewCount?: number;
+  likeCount?: number;
 }

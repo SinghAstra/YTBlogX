@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 
 export function useConversionStatus(
   conversionId: string
-): ConversionStatusData | null {
+): ConversionStatusData {
   const [conversionStatusData, setConversionStatusData] =
-    useState<ConversionStatusData | null>(null);
+    useState<ConversionStatusData>({
+      conversionId,
+      status: ConversionStatus.PENDING,
+    });
 
   useEffect(() => {
     if (!conversionId) return;
@@ -41,10 +44,6 @@ export function useConversionStatus(
       eventSource.close();
     };
   }, [conversionId]);
-
-  if (!conversionStatusData) {
-    return null;
-  }
 
   return conversionStatusData;
 }

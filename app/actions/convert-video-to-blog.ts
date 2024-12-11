@@ -9,6 +9,7 @@ import { ConversionStatus } from "@/types/conversion";
 import { fetchVideoMetadata } from "./youtube";
 
 export async function initiateConversion(videoUrl: string) {
+  console.log("In initiateConversion");
   // Validate URL
   if (!validateYouTubeUrl(videoUrl)) {
     return {
@@ -19,6 +20,8 @@ export async function initiateConversion(videoUrl: string) {
 
   // Generate a unique conversion ID
   const conversionId = await generateUniqueIdFromUrl(videoUrl);
+
+  console.log("conversionId: ", conversionId);
 
   if (!conversionId) {
     console.log("Conversion ID not generated --initiateConversion");
@@ -39,6 +42,7 @@ export async function processConversion(
   conversionId: string,
   videoUrl: string
 ) {
+  console.log("In ProcessConversion");
   conversionsMap.set(conversionId, {
     conversionId,
     status: ConversionStatus.PENDING,
@@ -66,16 +70,23 @@ export async function processConversion(
       status: ConversionStatus.METADATA_FETCHING,
     });
 
+    console.log("Before fetching metadata");
+
     // Fetch metadata
     const metadata = await fetchVideoMetadata(videoId);
+
+    console.log("After fetching metadata");
 
     conversionsMap.set(conversionId, {
       conversionId,
       status: ConversionStatus.TRANSCRIPT_EXTRACTING,
     });
 
+    console.log("Before fetching transcript");
     // Extract transcript
     const transcript = await extractYouTubeTranscript(videoId);
+
+    console.log("After fetching transcript");
 
     conversionsMap.set(conversionId, {
       conversionId,
@@ -85,15 +96,14 @@ export async function processConversion(
     // Generate blog content
     const blogContent = await generateBlogContent(transcript);
 
+    // console.log("blogContent is ", blogContent);
+    console.log("BLog Content Generated");
+
     conversionsMap.set(conversionId, {
       conversionId,
       status: ConversionStatus.COMPLETED,
       result: {
-        metadata: {
-          title: metadata.title,
-          thumbnail: metadata.thumbnail,
-          description: metadata.description,
-        },
+        metadata,
         blogContent,
       },
     });
@@ -101,11 +111,7 @@ export async function processConversion(
     // Return complete result
     return {
       success: true,
-      metadata: {
-        title: metadata.title,
-        thumbnail: metadata.thumbnail,
-        description: metadata.description,
-      },
+      metadata,
       blogContent,
     };
   } catch (error) {

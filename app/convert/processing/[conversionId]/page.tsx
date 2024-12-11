@@ -66,7 +66,7 @@ const statusMap: Record<ConversionStatus, number> = {
 
 export default function ProcessingPage() {
   const { conversionId } = useParams();
-  const status = useConversionStatus(conversionId as string);
+  const { status } = useConversionStatus(conversionId as string);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -148,27 +148,22 @@ export default function ProcessingPage() {
           })}
         </div>
 
-        <div className="text-center mt-6">
-          {status === ConversionStatus.FAILED && (
-            <>
-              <div className="flex flex-col items-center space-y-4">
-                <XCircle className="w-16 h-16 text-destructive" />
-                <h3 className="text-xl font-semibold text-destructive">
-                  Conversion Failed
-                </h3>
-                <p className="text-muted-foreground">
-                  We encountered an issue while converting your video.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/convert")}
-                >
-                  Try Again
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
+        {status === ConversionStatus.FAILED && (
+          <div className="text-center mt-6">
+            <div className="flex flex-col items-center space-y-4">
+              <XCircle className="w-16 h-16 text-destructive" />
+              <h3 className="text-xl font-semibold text-destructive">
+                Conversion Failed
+              </h3>
+              <p className="text-muted-foreground">
+                We encountered an issue while converting your video.
+              </p>
+              <Button variant="outline" onClick={() => router.push("/convert")}>
+                Try Again
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

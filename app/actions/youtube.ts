@@ -1,11 +1,12 @@
 "use server";
 
-export async function fetchVideoMetadata(videoId: string) {
+import { VideoMetaData } from "@/types/youtube";
+
+export async function fetchVideoMetadata(
+  videoId: string
+): Promise<VideoMetaData> {
+  // TODO:Fix the FetchVideoMetaData
   console.log("In fetchVideoMetaData");
-  if (!videoId) {
-    console.log("Video Id is required --fetchVideoMetadata");
-    return;
-  }
 
   const response = await fetch(
     `https://www.googleapis.com/youtube/v3/videos?` +
@@ -17,5 +18,20 @@ export async function fetchVideoMetadata(videoId: string) {
   );
 
   const data = await response.json();
-  return data;
+  const snippet = data.items[0].snippet;
+  const contentDetails = data.items[0].contentDetails;
+  const statistics = data.items[0].statistics;
+
+  return {
+    channelId: snippet.channelId,
+    videoTitle: snippet.title,
+    videoDescription: snippet.description,
+    thumbnail: snippet.thumbnails.maxres.url
+      ? snippet.thumbnails.maxres.url
+      : snippet.thumbnails.high.url,
+    channelTitle: snippet.channelTitle,
+    videoDuration: contentDetails.duration,
+    viewCount: parseInt(statistics.viewCount),
+    likeCount: parseInt(statistics.likeCount),
+  };
 }

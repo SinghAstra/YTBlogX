@@ -7,20 +7,12 @@ import {
   formatDuration,
   formatViewCount,
 } from "@/lib/youtube/utils";
+import { VideoMetaData } from "@/types/youtube";
 import { Clock, ExternalLink, Eye } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import VideoPreviewSkeleton from "./video-preview-skeleton";
-
-interface VideoDetails {
-  title: string;
-  channelTitle: string;
-  viewCount: string;
-  duration: string;
-  thumbnailUrl: string;
-  videoId: string;
-}
 
 interface VideoPreviewProps {
   url: string;
@@ -28,7 +20,7 @@ interface VideoPreviewProps {
 
 export function VideoPreview({ url }: VideoPreviewProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [videoDetails, setVideoDetails] = useState<VideoDetails | null>(null);
+  const [videoDetails, setVideoDetails] = useState<VideoMetaData>();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,23 +34,8 @@ export function VideoPreview({ url }: VideoPreviewProps) {
           throw new Error("Invalid YouTube URL");
         }
 
-        const data = await fetchVideoMetadata(videoId);
-
-        if (!data.items?.length) {
-          throw new Error("Video not found");
-        }
-
-        const video = data.items[0];
-        setVideoDetails({
-          title: video.snippet.title,
-          channelTitle: video.snippet.channelTitle,
-          viewCount: formatViewCount(parseInt(video.statistics.viewCount)),
-          duration: formatDuration(video.contentDetails.duration),
-          thumbnailUrl:
-            video.snippet.thumbnails.maxres?.url ||
-            video.snippet.thumbnails.high.url,
-          videoId,
-        });
+        const videoMetaData = await fetchVideoMetadata(videoId);
+        setVideoDetails(videoMetaData);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load video details"
@@ -92,25 +69,22 @@ export function VideoPreview({ url }: VideoPreviewProps) {
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-background/0 z-10" />
         <div className="relative w-full aspect-video">
-          <Image
-            src={videoDetails.thumbnailUrl}
-            alt="Video thumbnail"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-          />
+          {videoDetails.thumbnail && (
+            <Image
+              src={videoDetails.thumbnail}
+              alt="Video thumbnail"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+            />
+          )}
         </div>
         <div className="absolute bottom-4 right-4 z-20">
           <Button
             size="sm"
             className="bg-primary/90 hover:bg-primary/100 backdrop-blur-sm"
-            onClick={() =>
-              window.open(
-                `https://youtube.com/watch?v=${videoDetails.videoId}`,
-                "_blank"
-              )
-            }
+            onClick={() => window.open(url, "_blank")}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             Watch on YouTube
@@ -120,19 +94,23 @@ export function VideoPreview({ url }: VideoPreviewProps) {
       <div className="p-6 space-y-4">
         <div>
           <h3 className="text-xl font-semibold leading-tight mb-2">
-            {videoDetails.title}
+            {videoDetails.videoTitle}
           </h3>
           <p className="text-muted-foreground">{videoDetails.channelTitle}</p>
         </div>
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Eye className="h-4 w-4" />
-            <span>{videoDetails.viewCount} views</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span>{videoDetails.duration}</span>
-          </div>
+          {videoDetails.viewCount && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span>{formatViewCount(videoDetails.viewCount)} views</span>
+            </div>
+          )}
+          {videoDetails.videoDuration && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>{formatDuration(videoDetails.videoDuration)}</span>
+            </div>
+          )}
         </div>
       </div>
     </Card>
