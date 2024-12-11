@@ -1,4 +1,5 @@
-// app/api/sse/conversion/route.ts
+import { conversionsMap } from "@/app/actions/convert-video-to-blog";
+import { ConversionStatus, ConversionStatusData } from "@/types/conversion";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -13,22 +14,25 @@ export async function GET(request: NextRequest) {
   const stream = new ReadableStream({
     start(controller) {
       // Function to send updates
-      const sendUpdate = (data: any) => {
+      const sendUpdate = (data: ConversionStatusData) => {
         controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
       };
 
       // Initial connection message
-      sendUpdate({ status: "CONNECTED", conversionId });
+      sendUpdate({ status: ConversionStatus.PENDING, conversionId });
 
       // Setup interval to check for updates
       const intervalId = setInterval(() => {
-        const status = conversionsMap.get(conversionId);
+        const conversionStatusData = conversionsMap.get(conversionId);
 
-        if (status) {
-          sendUpdate(status);
+        if (conversionStatusData) {
+          sendUpdate(conversionStatusData);
 
           // Close stream if completed or failed
-          if (status.status === "COMPLETED" || status.status === "FAILED") {
+          if (
+            conversionStatusData.status === ConversionStatus.COMPLETED ||
+            conversionStatusData.status === ConversionStatus.FAILED
+          ) {
             clearInterval(intervalId);
             controller.close();
           }

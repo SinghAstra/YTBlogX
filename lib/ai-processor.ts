@@ -1,10 +1,9 @@
+import { BlogContent } from "@/types/blog";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function generateBlogContent(transcript: string): Promise<{
-  title: string;
-  content: string;
-  summary: string;
-}> {
+export async function generateBlogContent(
+  transcript: string
+): Promise<BlogContent> {
   // Initialize Gemini API
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });

@@ -1,5 +1,6 @@
 "use client";
 
+import { initiateConversion } from "@/app/actions/convert-video-to-blog";
 import { VideoPreview } from "@/components/conversion/video-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,23 +44,15 @@ export function ConversionForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/convert", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ videoUrl: url }),
-      });
+      const result = await initiateConversion(url);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Redirect to processing page with job ID
-        router.push(`/convert/processing/${data.jobId}`);
+      if (result?.success) {
+        // Redirect to processing page with conversion ID
+        router.push(`/convert/processing/${result.conversionId}`);
       } else {
         toast({
           title: "Error while Conversion",
-          description: "Conversion failed",
+          description: result?.error || "Conversion failed",
         });
       }
     } catch (error) {
