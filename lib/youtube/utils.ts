@@ -1,3 +1,35 @@
+import { fetchVideoMetadata } from "@/app/actions/youtube";
+
+export async function generateUniqueIdFromUrl(videoUrl: string) {
+  const videoId = extractVideoId(videoUrl);
+
+  if (!videoId) {
+    console.log("videoId not found --generateUniqueIdFromVideoUrl");
+    return;
+  }
+
+  // Extract video metadata from YouTube API
+  const metadata = await fetchVideoMetadata(videoId);
+
+  // Remove special characters and convert to lowercase
+  const sanitizeString = (str: string) =>
+    str
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .substring(0, 30);
+
+  // Create slug-like components
+  const titleSlug = sanitizeString(metadata.title);
+  const channelSlug = sanitizeString(metadata.channelTitle);
+
+  // Generate a short random component
+  const randomPart = Math.random().toString(36).substring(2, 6);
+
+  // Combine components
+  return `${titleSlug}-${channelSlug}-${randomPart}`;
+}
+
 export function extractVideoId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,

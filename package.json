@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "start:worker": "tsx scripts/start-worker",
-    "dev:all": "concurrently \"npm run dev\" \"npm run start:worker\""
+    "lint": "next lint"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

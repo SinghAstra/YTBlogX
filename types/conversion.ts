@@ -1,0 +1,7 @@
+export enum ConversionStatus {
+  PENDING,
+  METADATA_FETCHING,
+  TRANSCRIPT_EXTRACTING,
+  AI_PROCESSING,
+  COMPLETED,
+}

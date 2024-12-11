@@ -1,17 +1,11 @@
 "use client";
 
-import { ConversionOptions } from "@/components/conversion/conversion-options";
 import { VideoPreview } from "@/components/conversion/video-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import {
-  CheckCircle,
-  ClipboardIcon,
-  LoaderCircle,
-  XCircle,
-} from "lucide-react";
+import { ClipboardIcon, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -117,12 +111,7 @@ export function ConversionForm() {
 
           {isValid !== null && (
             <div className="flex items-center gap-2 text-sm">
-              {isValid ? (
-                <>
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-green-500">Valid YouTube URL</span>
-                </>
-              ) : (
+              {!isValid && (
                 <>
                   <XCircle className="h-4 w-4 text-red-500" />
                   <span className="text-red-500">Invalid YouTube URL</span>
@@ -135,7 +124,6 @@ export function ConversionForm() {
         {showPreview && (
           <div className="space-y-8 animate-in fade-in-50 duration-500">
             <VideoPreview url={url} />
-            <ConversionOptions />
             <div className="flex justify-center">
               <Button
                 size="lg"
