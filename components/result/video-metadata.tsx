@@ -14,7 +14,7 @@ interface VideoMetadataProps {
 export function VideoMetadata({ conversionData }: VideoMetadataProps) {
   const conversionResult = conversionData.result;
   if (!conversionResult) {
-    <VideoMetadataSkeleton />;
+    return <VideoMetadataSkeleton />;
   }
 
   if (!conversionResult?.metadata) {
@@ -24,7 +24,7 @@ export function VideoMetadata({ conversionData }: VideoMetadataProps) {
     conversionResult?.metadata;
 
   if (!thumbnail || !videoTitle || !videoDescription) {
-    return;
+    return null;
   }
   // TODO:Fix the watch Video Url Fetch the same metadata and entire metadata every time
 
@@ -46,14 +46,20 @@ export function VideoMetadata({ conversionData }: VideoMetadataProps) {
           </p>
           <div className="flex gap-3 mt-4">
             <Button size="sm" variant="outline" asChild>
-              {/* <a href={videoMetaData.videoUrl} target="_blank" rel="noopener noreferrer"> */}
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Watch Video
-              {/* </a> */}
+              <a
+                href="https://www.youtube.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Watch Video
+              </a>
             </Button>
-            <Button size="sm" variant="outline">
-              <Share2 className="w-4 h-4 mr-2" />
-              Share Blog
+            <Button size="sm" variant="outline" asChild>
+              <a href="https://www.youtube.com">
+                <Share2 className="w-4 h-4 mr-2" />
+                Share Blog
+              </a>
             </Button>
           </div>
         </div>
