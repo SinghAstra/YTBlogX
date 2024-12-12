@@ -19,10 +19,6 @@ export function Hero() {
           <br />
           Professional Blog Posts
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Generate engaging blog content from YouTube videos instantly using AI
-          technology. Just paste a URL and let our tool do the rest.
-        </p>
       </div>
       <div className="flex gap-4">
         <Link
@@ -40,7 +36,7 @@ export function Hero() {
           className={buttonVariants({
             variant: "outline",
             size: "lg",
-            className: "flex gap-2 items-center border-gray-600 ",
+            className: "flex gap-2 items-center ",
           })}
         >
           <Icons.gitLogo className="mr-2" /> Github

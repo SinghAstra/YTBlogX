@@ -1,7 +1,7 @@
 import { SiteConfig } from "@/types/site";
 
 export const siteConfig: SiteConfig = {
-  name: "YTBlogx",
+  name: "YTBlogX",
   description:
     "Generate professional blog posts from YouTube video content automatically using cutting-edge AI technology.",
   url: "https://ytblogx.vercel.app",
