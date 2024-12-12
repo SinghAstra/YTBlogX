@@ -5,14 +5,7 @@ import { useConversionStatus } from "@/hooks/use-conversion-status";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ConversionStatus } from "@/types/conversion";
-import {
-  Brain,
-  CheckCircle,
-  Cog,
-  FileText,
-  Video,
-  XCircle,
-} from "lucide-react";
+import { Brain, Cog, FileText, Video, XCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -40,18 +33,6 @@ const stages = [
     icon: Brain,
     title: "AI Processing",
     description: "Transforming video content into blog format",
-  },
-  {
-    status: ConversionStatus.FAILED,
-    icon: XCircle,
-    title: "Conversion Failed",
-    description: "An error occurred during the conversion process",
-  },
-  {
-    status: ConversionStatus.COMPLETED,
-    icon: CheckCircle,
-    title: "Conversion Complete",
-    description: "Successfully converted video to blog",
   },
 ];
 
@@ -103,50 +84,50 @@ export default function ProcessingPage() {
           </p>
         </div>
 
-        {/* Stages */}
-        <div className="grid grid-cols-4 gap-4 pt-4">
-          {stages.map((stage, index) => {
-            const isActive = index === currentStageIndex;
-            const isCompleted = index < currentStageIndex;
-            const Icon = stage.icon;
+        {status !== ConversionStatus.FAILED && (
+          <div className="grid grid-cols-4 gap-4 pt-4">
+            {stages.map((stage, index) => {
+              const isActive = index === currentStageIndex;
+              const isCompleted = index < currentStageIndex;
+              const Icon = stage.icon;
 
-            return (
-              <div
-                key={stage.status}
-                className={cn(
-                  "relative flex flex-col items-center p-4 rounded-lg transition-all duration-200",
-                  isActive && "bg-primary/20 animate-pulse",
-                  isCompleted && "bg-green/30",
-                  !isActive && !isCompleted && "bg-muted"
-                )}
-              >
+              return (
                 <div
+                  key={stage.status}
                   className={cn(
-                    "p-3 rounded-full mb-3",
-                    isActive &&
-                      "bg-primary text-primary-foreground animate-pulse",
-                    isCompleted && "text-primary",
-                    !isActive && !isCompleted && "bg-muted"
+                    "relative flex flex-col items-center p-4 rounded-lg transition-all duration-200 border-2",
+                    isActive && "border-primary",
+                    isCompleted && "border-green-400",
+                    !isActive && !isCompleted && "border-muted"
                   )}
                 >
-                  <Icon className={cn("w-6 h-6")} />
+                  <div
+                    className={cn(
+                      "p-3 rounded-full mb-3",
+                      isActive &&
+                        "bg-primary text-primary-foreground animate-pulse",
+                      isCompleted && "bg-green-400 text-black",
+                      !isActive && !isCompleted && "bg-muted"
+                    )}
+                  >
+                    <Icon className={cn("w-6 h-6")} />
+                  </div>
+                  <h3
+                    className={cn(
+                      "text-sm font-medium text-center",
+                      isCompleted && "text-green-400"
+                    )}
+                  >
+                    {stage.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground text-center mt-1">
+                    {stage.description}
+                  </p>
                 </div>
-                <h3
-                  className={cn(
-                    "text-sm font-medium text-center",
-                    isActive && "font-bold",
-                    isCompleted && "text-primary"
-                  )}
-                >
-                  {stage.title}
-                </h3>
-                <p className="text-xs text-muted-foreground text-center mt-1">
-                  {stage.description}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {status === ConversionStatus.FAILED && (
           <div className="text-center mt-6">
