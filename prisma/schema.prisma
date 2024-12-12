@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relationships
+  conversions   Conversion[]
+  savedBlogs    Blog[]
+}
+
+model VideoMetaData{
+  id            String    @id @default(cuid())
+  conversionId  String    @unique
+  conversion    Conversion @relation(fields: [conversionId], references: [id])
+
+  channelId String?
+  videoTitle String?
+  videoDescription String?
+  thumbnail String?
+  channelTitle String?
+  videoDuration String?
+  viewCount Int?
+  likeCount Int?
+}
+
+model Conversion {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  
+  youtubeUrl    String
+  status        ConversionStatus @default(PENDING)
+  
+  videoMetaData VideoMetaData?
+  
+  // Generated content
+  generatedBlog Blog?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum ConversionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Blog {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  content       String    @db.Text
+  
+  // Relationship to Conversion
+  conversionId  String    @unique
+  conversion    Conversion @relation(fields: [conversionId], references: [id])
+
+  savedByUsers  User[]
+  
+  // Optional public sharing
+  isPublic      Boolean   @default(false)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
