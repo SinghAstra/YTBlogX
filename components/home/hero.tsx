@@ -2,11 +2,25 @@
 
 import { siteConfig } from "@/config/site";
 import { Video } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Icons } from "../Icons";
-import { buttonVariants } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 
 export function Hero() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const handleGetStarted = () => {
+    if (status === "loading") return;
+
+    if (session) {
+      router.push("/convert/new");
+    } else {
+      router.push("/auth/sign-in");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[90vh] px-4">
       <div className="text-center mb-8 space-y-4">
@@ -21,15 +35,20 @@ export function Hero() {
         </h1>
       </div>
       <div className="flex gap-4">
-        <Link
-          href="/convert/new"
-          className={buttonVariants({
-            variant: "default",
-            size: "lg",
-          })}
+        <Button
+          variant="default"
+          size="lg"
+          onClick={handleGetStarted}
+          disabled={status === "loading"}
+          className="flex items-center"
         >
-          <Video className="mr-2" /> Get Started
-        </Link>
+          {status === "loading" ? (
+            <Icons.loader className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Video className="mr-2" />
+          )}
+          Get Started
+        </Button>
         <Link
           href={siteConfig.links.github}
           target="_blank"

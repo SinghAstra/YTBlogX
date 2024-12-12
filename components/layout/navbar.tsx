@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -50,8 +50,16 @@ export function Navbar() {
           ) : session?.user ? (
             <AvatarMenu />
           ) : (
-            <Button asChild variant="secondary" size="sm">
-              <Link href="/auth/sign-in">Get Started</Link>
+            <Button asChild>
+              <Link
+                href="/auth/sign-in"
+                className={buttonVariants({
+                  variant: "default",
+                  size: "sm",
+                })}
+              >
+                Sign In
+              </Link>
             </Button>
           )}
         </div>
