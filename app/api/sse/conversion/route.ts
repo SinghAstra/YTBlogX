@@ -1,4 +1,4 @@
-import { conversionsMap } from "@/lib/conversion-store";
+import { ConversionStore } from "@/lib/conversion-store";
 import { ConversionStatus, ConversionStatusData } from "@/types/conversion";
 import { NextRequest } from "next/server";
 
@@ -13,25 +13,25 @@ export async function GET(request: NextRequest) {
   }
 
   // Create a readable stream for SSE with manual implementation
-  const stream = new ReadableStream(
-    {
-      start(controller) {
-        // Function to send updates
-        const sendUpdate = (data: ConversionStatusData) => {
-          console.log("data --sendUpdate is ", data);
-          const formattedEvent = `data: ${JSON.stringify(data)}\n\n`;
-          controller.enqueue(formattedEvent);
-        };
+  const stream = new ReadableStream({
+    start(controller) {
+      // Function to send updates
+      const sendUpdate = (data: ConversionStatusData) => {
+        console.log("data --sendUpdate is ", data);
+        const formattedEvent = `data: ${JSON.stringify(data)}\n\n`;
+        controller.enqueue(formattedEvent);
+      };
 
-        // Initial connection message
-        sendUpdate({
-          status: ConversionStatus.PENDING,
-          conversionId,
-        });
+      // Track if stream should continue
+      let shouldContinue = true;
 
-        // Create a function for checking updates
-        const checkUpdates = () => {
-          const conversionStatusData = conversionsMap.get(conversionId);
+      // Create a function for checking updates
+      const checkUpdates = async () => {
+        if (!shouldContinue) return;
+
+        try {
+          console.log("Inside checkUpdates.");
+          const conversionStatusData = await ConversionStore.get(conversionId);
 
           console.log("conversionStatusData --/api/sse", conversionStatusData);
 
@@ -43,32 +43,34 @@ export async function GET(request: NextRequest) {
               conversionStatusData.status === ConversionStatus.COMPLETED ||
               conversionStatusData.status === ConversionStatus.FAILED
             ) {
+              shouldContinue = false;
               controller.close();
               return;
             }
           }
 
-          // Continue checking if stream is not closed
-          if (!controller.desiredSize) {
+          // Continue checking if not closed
+          if (shouldContinue) {
+            // Use setImmediate or setTimeout to avoid blocking
             setTimeout(checkUpdates, 500);
           }
-        };
+        } catch (error) {
+          console.error("Error in checkUpdates:", error);
+          shouldContinue = false;
+          controller.error(error);
+        }
+      };
 
-        // Start checking updates
-        checkUpdates();
-      },
-      pull() {
-        // Optional pull method to handle backpressure
-        console.log("Stream pull method called");
-      },
-      cancel() {
-        console.log("Stream cancelled");
-      },
+      // Initial connection message
+      sendUpdate({
+        status: ConversionStatus.PENDING,
+        conversionId,
+      });
+
+      // Start checking updates
+      checkUpdates();
     },
-    {
-      highWaterMark: 1,
-    }
-  );
+  });
 
   // Return SSE response
   return new Response(stream, {

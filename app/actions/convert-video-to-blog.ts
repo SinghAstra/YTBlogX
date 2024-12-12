@@ -1,7 +1,7 @@
 "use server";
 
 import { generateBlogContent } from "@/lib/ai-processor";
-import { conversionsMap } from "@/lib/conversion-store";
+import { ConversionStore } from "@/lib/conversion-store";
 import { extractYouTubeTranscript } from "@/lib/transcript-extractor";
 import { extractVideoId, generateUniqueIdFromUrl } from "@/lib/youtube/utils";
 import { validateYouTubeUrl } from "@/lib/youtube/validation";
@@ -43,7 +43,7 @@ export async function processConversion(
   videoUrl: string
 ) {
   console.log("In ProcessConversion");
-  conversionsMap.set(conversionId, {
+  await ConversionStore.set(conversionId, {
     conversionId,
     status: ConversionStatus.PENDING,
   });
@@ -65,7 +65,7 @@ export async function processConversion(
       return;
     }
 
-    conversionsMap.set(conversionId, {
+    await ConversionStore.updateStatus(conversionId, {
       conversionId,
       status: ConversionStatus.METADATA_FETCHING,
     });
@@ -77,7 +77,7 @@ export async function processConversion(
 
     console.log("After fetching metadata");
 
-    conversionsMap.set(conversionId, {
+    await ConversionStore.updateStatus(conversionId, {
       conversionId,
       status: ConversionStatus.TRANSCRIPT_EXTRACTING,
     });
@@ -88,7 +88,7 @@ export async function processConversion(
 
     console.log("After fetching transcript");
 
-    conversionsMap.set(conversionId, {
+    await ConversionStore.updateStatus(conversionId, {
       conversionId,
       status: ConversionStatus.AI_PROCESSING,
     });
@@ -99,7 +99,7 @@ export async function processConversion(
     // console.log("blogContent is ", blogContent);
     console.log("BLog Content Generated");
 
-    conversionsMap.set(conversionId, {
+    await ConversionStore.updateStatus(conversionId, {
       conversionId,
       status: ConversionStatus.COMPLETED,
       result: {
@@ -115,7 +115,7 @@ export async function processConversion(
       blogContent,
     };
   } catch (error) {
-    conversionsMap.set(conversionId, {
+    await ConversionStore.updateStatus(conversionId, {
       conversionId,
       status: ConversionStatus.FAILED,
     });
