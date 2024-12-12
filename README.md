@@ -1,6 +1,6 @@
 # 📝 YTBlogX
 
-Helping developers learn code without watching long YouTube videos by converting videos to blogs
+Helping developers learn code without watching long YouTube videos by converting videos to blogs.
 
 ## 🛠 Tech Stack
 
