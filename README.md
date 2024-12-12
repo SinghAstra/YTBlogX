@@ -7,6 +7,6 @@ Helping developers learn code without watching long YouTube videos by converting
 - **Frontend**: Next.js
 - **AI**: Gemini API
 - **Services**:
-  - YouTube Data API
+  - YouTube Data API v3
   - Speech-to-Text
   - Natural Language Processing
