@@ -1,15 +1,23 @@
 "use server";
 
 import { generateBlogContent } from "@/lib/ai-processor";
+import { authOptions } from "@/lib/auth";
 import { ConversionStore } from "@/lib/conversion-store";
 import { extractYouTubeTranscript } from "@/lib/transcript-extractor";
 import { extractVideoId, generateUniqueIdFromUrl } from "@/lib/youtube/utils";
 import { validateYouTubeUrl } from "@/lib/youtube/validation";
 import { ConversionStatus } from "@/types/conversion";
+import { getServerSession } from "next-auth";
 import { fetchVideoMetadata } from "./youtube";
 
 export async function initiateConversion(videoUrl: string) {
-  console.log("In initiateConversion");
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    console.error("Unauthorized User --initiateConversion.");
+    return;
+  }
+
   // Validate URL
   if (!validateYouTubeUrl(videoUrl)) {
     return {
@@ -28,6 +36,12 @@ export async function initiateConversion(videoUrl: string) {
     return;
   }
 
+  await ConversionStore.set(conversionId, {
+    status: ConversionStatus.PENDING,
+    youtubeUrl: videoUrl,
+    userId: session.user.id,
+  });
+
   // Start the conversion process in the background
   processConversion(conversionId, videoUrl);
 
@@ -42,20 +56,6 @@ export async function processConversion(
   conversionId: string,
   videoUrl: string
 ) {
-  console.log("In ProcessConversion");
-  await ConversionStore.set(conversionId, {
-    conversionId,
-    status: ConversionStatus.PENDING,
-  });
-
-  // Validate URL
-  if (!validateYouTubeUrl(videoUrl)) {
-    return {
-      success: false,
-      error: "Invalid YouTube URL",
-    };
-  }
-
   try {
     // Extract video ID
     const videoId = extractVideoId(videoUrl);
@@ -66,7 +66,6 @@ export async function processConversion(
     }
 
     await ConversionStore.updateStatus(conversionId, {
-      conversionId,
       status: ConversionStatus.METADATA_FETCHING,
     });
 

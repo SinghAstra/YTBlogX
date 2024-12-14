@@ -12,7 +12,7 @@ const SignInPage = () => {
     try {
       setIsLoading(true);
       await signIn("google", {
-        callbackUrl: "/dashboard",
+        callbackUrl: "/convert/new",
       });
     } catch (error) {
       console.log("GitHub authentication error:", error);
