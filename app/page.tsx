@@ -5,6 +5,27 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
+function splitTranscript(transcript: string, chunkSize: number = 10000) {
+  const sentences = transcript.split(/(?<=[.!?])\s+/); // Split at sentence boundaries
+  const chunks = [];
+  let currentChunk = "";
+
+  for (const sentence of sentences) {
+    if ((currentChunk + sentence).length > chunkSize) {
+      chunks.push(currentChunk);
+      currentChunk = sentence;
+    } else {
+      currentChunk += " " + sentence;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
 function HomePage() {
   const [url, setUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +57,7 @@ function HomePage() {
         throw new Error(data.message || "Failed to fetch transcript");
 
       setTranscript(data.transcript);
+      console.log(splitTranscript(data.transcript));
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
