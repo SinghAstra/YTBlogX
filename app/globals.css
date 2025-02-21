@@ -3,50 +3,41 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
+body {
   font-family: "Poppins", system-ui;
 }
 
 @layer base {
   :root {
-    /* Core background and surface colors */
-    --background: 222 47% 5%;
-    --foreground: 213 31% 91%;
-
-    /* Elevated surfaces */
-    --card: 222 47% 7%;
-    --card-foreground: 213 31% 91%;
-    --popover: 222 47% 7%;
-    --popover-foreground: 213 31% 91%;
-
-    /* Primary accent - Vivid blue */
-    --primary: 214 95% 65%;
-    --primary-foreground: 222 47% 5%;
-
-    /* Secondary - Subtle blue-gray */
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 213 31% 91%;
-
-    /* Muted elements */
-    --muted: 222 47% 11%;
-    --muted-foreground: 215 20% 65%;
-
-    /* Accent - Slightly brighter than secondary */
-    --accent: 217 19% 27%;
-    --accent-foreground: 213 31% 91%;
-
-    /* Destructive actions */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-
-    /* Borders and inputs */
-    --border: 222 47% 11%;
-    --input: 222 20% 15%;
-    --ring: 214 95% 65%;
-
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
     /* Radius */
     --radius: 0.875rem;
 
+    --match-highlight: 214 95% 40%;
+    --match-highlight-border: 214 95% 50%;
     --stats-blue: 210 40% 50%; /* Vibrant blue */
     --stats-purple: 270 50% 50%; /* Deep purple */
     --stats-pink: 330 60% 50%; /* Bright pink */
@@ -65,35 +56,39 @@
   body {
     @apply bg-background text-foreground;
   }
-}
 
-body {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-}
+  /* Apply scrollbar styles globally */
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--secondary)) transparent;
+  }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+  /* Target all elements that can scroll */
+  *::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 3px;
+    height: 6px; /* For horizontal scrollbars */
+  }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-::-webkit-scrollbar {
-  width: 6px;
-  scrollbar-color: hsl(222 47% 11%);
-}
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--secondary));
+    border-radius: 8px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background-color: hsl(222 47% 11%);
-  border-radius: 3px;
-}
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--secondary) / 0.8);
+    cursor: grab;
+  }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0);
+  /* Specific styling for horizontal scrollbars */
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 input:-webkit-autofill,
@@ -111,20 +106,6 @@ input:-webkit-autofill:not(:focus) {
   -webkit-text-fill-color: hsl(var(--foreground)) !important;
 }
 
-.animate-gradient {
-  background-size: 300%;
-  -webkit-animation: animated-gradient 6s ease infinite alternate;
-  animation: animated-gradient 6s ease infinite alternate;
-}
-
-@keyframes animated-gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.bg-grid-white {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' width='64' height='64' fill='none' stroke='rgb(255 255 255 / 0.02)'%3e%3cpath d='M0 .5H63.5V64'/%3e%3c/svg%3e");
 }
