@@ -1,25 +1,84 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+function splitTranscript(transcript: string, chunkSize: number = 10000) {
+  const sentences = transcript.split(/(?<=[.!?])\s+/); // Split at sentence boundaries
+  const chunks = [];
+  let currentChunk = "";
+
+  for (const sentence of sentences) {
+    if ((currentChunk + sentence).length > chunkSize) {
+      chunks.push(currentChunk);
+      currentChunk = sentence;
+    } else {
+      currentChunk += " " + sentence;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
 export async function generateBlogContent(transcript: string) {
-  // Initialize Gemini API
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+  const genAI = new GoogleGenerativeAI(
+    process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
+  );
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  try {
-    // Generate blog content
-    const contentPrompt = `You are an expert content converter. 
-    Convert the following YouTube video transcript into a well-structured, 
-    engaging blog post.
+  const chunks = splitTranscript(transcript, 8000);
+  let blogContent = "";
 
-    Transcript to convert:
-    ${transcript}`;
+  for (let i = 0; i < chunks.length; i++) {
+    const prompt =
+      i === 0
+        ? `You are an AI technical writer. Based on the following transcript from a YouTube video, generate a well-structured technical blog post in Markdown format. Ensure proper headings, subheadings, lists, and a conclusion. \n\nTranscript:\n"${chunks[i]}"`
+        : `Continue writing from the previous section. Maintain the structure, headings, and Markdown format.\n\nTranscript:\n"${chunks[i]}"`;
 
-    const contentResponse = await model.generateContent(contentPrompt);
-    const generatedContent = contentResponse.response.text() || "";
-
-    return generatedContent;
-  } catch (error) {
-    console.error("AI processing error:", error);
-    throw new Error("Failed to generate blog content");
+    try {
+      const contentResponse = await model.generateContent(prompt);
+      const generatedText = contentResponse.response.text() || "";
+      console.log("generatedText is ", generatedText);
+      blogContent += generatedText + "\n\n"; // Append to final content
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
+      throw new Error("Failed to generate blog content");
+    }
   }
+
+  return blogContent;
 }
+
+// import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// export async function generateBlogContent(transcript: string) {
+//   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+//   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+//   const chunks = splitTranscript(transcript, 8000);
+//   let blogContent = ""; // Store final blog content
+//   let previousResponse = ""; // Store last AI response for context
+
+//   for (let i = 0; i < chunks.length; i++) {
+//     const prompt = i === 0
+//       ? `You are an AI technical writer. Generate a structured technical blog post in Markdown based on the transcript below. Use proper headings, subheadings, and lists.\n\nTranscript:\n"${chunks[i]}"`
+//       : `Continue writing from the previous section. Maintain the structure, headings, and Markdown format.\n\nPrevious response:\n"${previousResponse}"\n\nNext transcript:\n"${chunks[i]}"`;
+
+//     try {
+//       const contentResponse = await model.generateContent(prompt);
+//       const generatedText = contentResponse.response.text() || "";
+
+//       blogContent += generatedText + "\n\n"; // Append to final content
+//       previousResponse = generatedText; // Store for next chunk
+//     } catch (error) {
+//       console.error("AI processing error:", error);
+//       throw new Error("Failed to generate blog content");
+//     }
+//   }
+
+//   return blogContent;
+// }

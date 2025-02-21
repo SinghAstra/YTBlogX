@@ -2,40 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { generateBlogContent } from "@/lib/ai-processor";
 import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
-
-function splitTranscript(transcript: string, chunkSize: number = 10000) {
-  const sentences = transcript.split(/(?<=[.!?])\s+/); // Split at sentence boundaries
-  const chunks = [];
-  let currentChunk = "";
-
-  for (const sentence of sentences) {
-    if ((currentChunk + sentence).length > chunkSize) {
-      chunks.push(currentChunk);
-      currentChunk = sentence;
-    } else {
-      currentChunk += " " + sentence;
-    }
-  }
-
-  if (currentChunk) {
-    chunks.push(currentChunk);
-  }
-
-  return chunks;
-}
 
 function HomePage() {
   const [url, setUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [transcript, setTranscript] = useState("");
+  const [blogPost, setBlogPost] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTranscript("");
+    setBlogPost("");
 
     const youtubeRegex =
       /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)$/;
@@ -56,14 +36,14 @@ function HomePage() {
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch transcript");
 
-      setTranscript(data.transcript);
-      console.log(splitTranscript(data.transcript));
+      const blogContent = await generateBlogContent(data.transcript);
+      setBlogPost(blogContent);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
         console.log("error.message is ", error.message);
       }
-      setError("Failed to fetch transcript");
+      setError("Failed to fetch transcript or generate blog post");
     }
 
     setIsSubmitting(false);
@@ -87,16 +67,16 @@ function HomePage() {
                 <FaSpinner className="animate-spin mr-2" /> Fetching...
               </>
             ) : (
-              "Get Transcript"
+              "Get Blog Post"
             )}
           </Button>
         </form>
-        {transcript && (
+        {blogPost && (
           <div className="mt-4 p-3 border rounded-md bg-muted text-muted-foreground">
-            <h3 className="text-lg font-bold">Transcript:</h3>
-            <p className="text-sm whitespace-pre-wrap break-words">
-              {transcript}
-            </p>
+            <h3 className="text-lg font-bold">Generated Blog Post:</h3>
+            <pre className="text-sm whitespace-pre-wrap break-words">
+              {blogPost}
+            </pre>
           </div>
         )}
       </div>
