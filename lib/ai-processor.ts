@@ -1,11 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function splitTranscript(transcript: string, chunkSize: number = 10000) {
+export function splitTranscript(transcript: string, chunkSize: number = 10000) {
   const sentences = transcript.split(/(?<=[.!?])\s+/); // Split at sentence boundaries
   const chunks = [];
   let currentChunk = "";
 
   for (const sentence of sentences) {
+    if (sentence.length > chunkSize) {
+      // Split long sentences into smaller chunks
+      for (let i = 0; i < sentence.length; i += chunkSize) {
+        chunks.push(sentence.slice(i, i + chunkSize));
+      }
+      continue; // Skip to next sentence
+    }
+
     if ((currentChunk + sentence).length > chunkSize) {
       chunks.push(currentChunk);
       currentChunk = sentence;
@@ -18,6 +26,11 @@ function splitTranscript(transcript: string, chunkSize: number = 10000) {
     chunks.push(currentChunk);
   }
 
+  console.log("chunks.length is ", chunks.length);
+  console.log("chunks is ", chunks);
+  console.log("chunks is ", chunks[0].length);
+  console.log("chunks is ", chunks[1].length);
+
   return chunks;
 }
 
@@ -28,19 +41,15 @@ export async function generateBlogContent(transcript: string) {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const chunks = splitTranscript(transcript, 8000);
-  let blogContent = "";
+  const blogContent = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const prompt =
-      i === 0
-        ? `You are an AI technical writer. Based on the following transcript from a YouTube video, generate a well-structured technical blog post in Markdown format. Ensure proper headings, subheadings, lists, and a conclusion. \n\nTranscript:\n"${chunks[i]}"`
-        : `Continue writing from the previous section. Maintain the structure, headings, and Markdown format.\n\nTranscript:\n"${chunks[i]}"`;
+    const prompt = `Act as CS Professor and explain me this topic in a simple way. \n\nTranscript:\n"${chunks[i]}"`;
 
     try {
       const contentResponse = await model.generateContent(prompt);
       const generatedText = contentResponse.response.text() || "";
-      console.log("generatedText is ", generatedText);
-      blogContent += generatedText + "\n\n"; // Append to final content
+      blogContent.push(generatedText + "\n\n");
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);

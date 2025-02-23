@@ -2,56 +2,70 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { generateBlogContent } from "@/lib/ai-processor";
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { generateBlogContent, splitTranscript } from "@/lib/ai-processor";
+import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 function HomePage() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(
+    "https://www.youtube.com/watch?v=KzH1ovd4Ots&list=PLoROMvodv4rNH7qL6-efu_q2_bPuy0adh&index=1&t=3620s"
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [blogPost, setBlogPost] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [transcriptChunks, setTranscriptChunks] = useState<string[]>([]);
+  const [blogPostChunks, setBlogPostChunks] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setBlogPost("");
+    setTranscriptChunks([]);
+    setBlogPostChunks([]);
 
     const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)$/;
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     const match = url.match(youtubeRegex);
     if (!match) {
-      setError("Invalid YouTube URL");
+      setMessage("Invalid YouTube URL");
       setIsSubmitting(false);
       return;
     }
 
-    setError("");
     const videoId = match[4];
 
     try {
       const response = await fetch(`/api/transcript?videoId=${videoId}`);
       const data = await response.json();
+      setTranscriptChunks(splitTranscript(data.transcript, 8000));
 
       if (!response.ok)
-        throw new Error(data.message || "Failed to fetch transcript");
+        setMessage(data.message || "Failed to fetch transcript");
 
       const blogContent = await generateBlogContent(data.transcript);
-      setBlogPost(blogContent);
+      setBlogPostChunks(blogContent);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
         console.log("error.message is ", error.message);
       }
-      setError("Failed to fetch transcript or generate blog post");
+      setMessage("Check Your Network Connectivity.");
     }
 
     setIsSubmitting(false);
   };
 
+  useEffect(() => {
+    if (!message) return;
+    toast({
+      title: message,
+    });
+    setMessage(null);
+  }, [toast, message]);
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background text-foreground p-4">
-      <div className="max-w-xl w-full p-6 border rounded-lg bg-card shadow-lg">
+    <div className="flex flex-col gap-4 backdrop: items-center justify-center min-h-screen bg-background text-foreground p-4">
+      <div className="max-w-xl w-full p-6 border rounded-lg">
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             type="text"
@@ -60,7 +74,6 @@ function HomePage() {
             onChange={(e) => setUrl(e.target.value)}
             className="border border-border p-2 rounded-md w-full"
           />
-          {error && <p className="text-destructive text-sm">{error}</p>}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
@@ -71,14 +84,38 @@ function HomePage() {
             )}
           </Button>
         </form>
-        {blogPost && (
-          <div className="mt-4 p-3 border rounded-md bg-muted text-muted-foreground">
-            <h3 className="text-lg font-bold">Generated Blog Post:</h3>
-            <pre className="text-sm whitespace-pre-wrap break-words">
-              {blogPost}
-            </pre>
-          </div>
-        )}
+      </div>
+      <div className=" p-3 flex gap-4">
+        <div className="flex flex-col gap-4">
+          {transcriptChunks &&
+            transcriptChunks.map((chunk, index) => {
+              return (
+                <div key={index}>
+                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
+                    <h3 className="text-lg font-medium">Part {index}:</h3>
+                    <pre className="text-sm whitespace-pre-wrap break-words">
+                      {chunk}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+        <div className="flex flex-col gap-4">
+          {blogPostChunks &&
+            blogPostChunks.map((chunk, index) => {
+              return (
+                <div key={index}>
+                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
+                    <h3 className="text-lg font-medium">Part {index}:</h3>
+                    <pre className="text-sm whitespace-pre-wrap break-words">
+                      {chunk}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );
