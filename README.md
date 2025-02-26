@@ -149,9 +149,9 @@ blog Blog @relation(fields: [blogId], references: [id])
     UI Trigger:
     From /dashboard if you add a "Delete" button.
 
-I want to tell user about three features of my web app :
+I want to tell user about features of my web app in Feature Section Add all of them in every feature section :
 📹 YouTube Integration — Fetch transcripts with one link.
 ✂️ Smart Splitting — Break long transcripts into meaningful blog sections.
 ✨ AI Summaries — Generate easy-to-read blog drafts for each part.
 I want you to build three different Feature Section by taking inspiration from SAAS
-make each of the different UI one tab option
+make every Feature Section a tab option
