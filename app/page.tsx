@@ -2,123 +2,105 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { generateBlogContent, splitTranscript } from "@/lib/ai-processor";
-import { useEffect, useState } from "react";
-import { FaSpinner } from "react-icons/fa";
+import { siteConfig } from "@/config/site";
+import { Code, FileTextIcon, Rocket, YoutubeIcon } from "lucide-react";
+import { useState } from "react";
+import "./globals.css";
 
-function HomePage() {
-  const [url, setUrl] = useState(
-    "https://www.youtube.com/watch?v=KzH1ovd4Ots&list=PLoROMvodv4rNH7qL6-efu_q2_bPuy0adh&index=1&t=3620s"
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const { toast } = useToast();
-  const [transcriptChunks, setTranscriptChunks] = useState<string[]>([]);
-  const [blogPostChunks, setBlogPostChunks] = useState<string[]>([]);
+function App() {
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setTranscriptChunks([]);
-    setBlogPostChunks([]);
-
-    const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(youtubeRegex);
-    if (!match) {
-      setMessage("Invalid YouTube URL");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const videoId = match[4];
-
-    try {
-      const response = await fetch(`/api/transcript?videoId=${videoId}`);
-      const data = await response.json();
-      setTranscriptChunks(splitTranscript(data.transcript, 8000));
-
-      if (!response.ok)
-        setMessage(data.message || "Failed to fetch transcript");
-
-      const blogContent = await generateBlogContent(data.transcript);
-      setBlogPostChunks(blogContent);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("error.stack is ", error.stack);
-        console.log("error.message is ", error.message);
-      }
-      setMessage("Check Your Network Connectivity.");
-    }
-
-    setIsSubmitting(false);
+    // Handle YouTube URL submission
+    console.log("Submitted URL:", youtubeUrl);
+    // Reset input after submission
+    setYoutubeUrl("");
   };
 
-  useEffect(() => {
-    if (!message) return;
-    toast({
-      title: message,
-    });
-    setMessage(null);
-  }, [toast, message]);
-
   return (
-    <div className="flex flex-col gap-4 items-center justify-center min-h-screen bg-background text-foreground p-4">
-      <div className="max-w-xl w-full p-6 border rounded-lg">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Enter YouTube video URL"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="border border-border p-2 rounded-md w-full"
-          />
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <FaSpinner className="animate-spin mr-2" /> Fetching...
-              </>
-            ) : (
-              "Get Blog Post"
-            )}
-          </Button>
-        </form>
-      </div>
-      <div className=" p-3 flex gap-4">
-        <div className="flex flex-col gap-4">
-          {transcriptChunks &&
-            transcriptChunks.map((chunk, index) => {
-              return (
-                <div key={index}>
-                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
-                    <h3 className="text-lg font-medium">Part {index}:</h3>
-                    <pre className="text-sm whitespace-pre-wrap break-words">
-                      {chunk}
-                    </pre>
-                  </div>
-                </div>
-              );
-            })}
+    <div className="min-h-screen flex flex-col container justify-center items-center mx-auto">
+      <div className="flex gap-6 lg:gap-12">
+        <div className="flex flex-col justify-center space-y-4 flex-1">
+          <div className="flex items-center rounded-lg bg-muted px-3 py-1 text-sm font-medium w-fit mb-2">
+            <Rocket className="mr-1 h-4 w-4" />
+            <span>Introducing {siteConfig.name}</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl">
+              Transform Videos into{" "}
+              <span className="text-purple-400">Engaging</span> Blog Content
+            </h1>
+            <p className="max-w-[600px] text-muted-foreground md:text-xl">
+              Our AI-powered platform converts YouTube videos into
+              well-structured, SEO-friendly blog posts with just one click.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 min-[400px]:flex-row">
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full max-w-sm items-center space-x-2"
+            >
+              <Input
+                type="text"
+                placeholder="Paste YouTube URL"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                type="submit"
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                Generate Blog
+              </Button>
+            </form>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            No credit card required. Start converting videos instantly.
+          </p>
         </div>
-        <div className="flex flex-col gap-4">
-          {blogPostChunks &&
-            blogPostChunks.map((chunk, index) => {
-              return (
-                <div key={index}>
-                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
-                    <h3 className="text-lg font-medium">Part {index}:</h3>
-                    <pre className="text-sm whitespace-pre-wrap break-words">
-                      {chunk}
-                    </pre>
-                  </div>
-                </div>
-              );
-            })}
+        <div className="flex items-center justify-center lg:w-[400px] xl:w-[600px]">
+          <div className="relative w-full h-[400px] perspective">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl"></div>
+            <div className="absolute top-8 left-8 right-8 bottom-8 bg-card rounded-lg shadow-2xl transform rotate-6 z-10 p-6 border border-purple-500/20">
+              <div className="flex items-center space-x-2 mb-4">
+                <YoutubeIcon className="h-6 w-6 text-red-500" />
+                <div className="h-2 bg-muted rounded-full w-3/4"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 bg-muted rounded-full w-full"></div>
+                <div className="h-3 bg-muted rounded-full w-5/6"></div>
+                <div className="h-3 bg-muted rounded-full w-4/6"></div>
+              </div>
+            </div>
+            <div className="absolute top-12 left-12 right-12 bottom-12 bg-card rounded-lg shadow-2xl transform -rotate-3 z-20 p-6 border border-blue-500/20">
+              <div className="flex items-center space-x-2 mb-4">
+                <FileTextIcon className="h-6 w-6 text-blue-500" />
+                <div className="h-2 bg-muted rounded-full w-3/4"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 bg-muted rounded-full w-full"></div>
+                <div className="h-3 bg-muted rounded-full w-5/6"></div>
+                <div className="h-3 bg-muted rounded-full w-4/6"></div>
+              </div>
+            </div>
+            <div className="absolute top-16 left-16 right-16 bottom-16 bg-card rounded-lg shadow-2xl z-30 p-6 border border-purple-500/20">
+              <div className="flex items-center space-x-2 mb-4">
+                <Code className="h-6 w-6 text-purple-500" />
+                <div className="h-2 bg-muted rounded-full w-3/4"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 bg-muted rounded-full w-full"></div>
+                <div className="h-3 bg-muted rounded-full w-5/6"></div>
+                <div className="h-3 bg-muted rounded-full w-4/6"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default HomePage;
+export default App;

@@ -3,22 +3,25 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { generateBlogContent, splitTranscript } from "@/lib/ai-processor";
+import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
-const CaptureFrame = () => {
+function DemoPage() {
   const [url, setUrl] = useState(
     "https://www.youtube.com/watch?v=KzH1ovd4Ots&list=PLoROMvodv4rNH7qL6-efu_q2_bPuy0adh&index=1&t=3620s"
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [frames, setFrames] = useState<string[]>([]);
   const { toast } = useToast();
+  const [transcriptChunks, setTranscriptChunks] = useState<string[]>([]);
+  const [blogPostChunks, setBlogPostChunks] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setTranscriptChunks([]);
+    setBlogPostChunks([]);
 
     const youtubeRegex =
       /^(https?:\/\/)?(www\.)?(youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -29,15 +32,18 @@ const CaptureFrame = () => {
       return;
     }
 
+    const videoId = match[4];
+
     try {
-      const response = await fetch(
-        `/api/capture-frame?url=${encodeURIComponent(url)}`
-      );
+      const response = await fetch(`/api/transcript?videoId=${videoId}`);
       const data = await response.json();
+      setTranscriptChunks(splitTranscript(data.transcript, 8000));
 
       if (!response.ok)
-        setMessage(data.message || "Failed to fetch Video Frame");
-      setFrames(data.frames);
+        setMessage(data.message || "Failed to fetch transcript");
+
+      const blogContent = await generateBlogContent(data.transcript);
+      setBlogPostChunks(blogContent);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
@@ -74,24 +80,45 @@ const CaptureFrame = () => {
                 <FaSpinner className="animate-spin mr-2" /> Fetching...
               </>
             ) : (
-              "Get Video Frame"
+              "Get Blog Post"
             )}
           </Button>
         </form>
-        <div className="flex flex-wrap gap-2">
-          {frames.map((frame, index) => (
-            <Image
-              key={index}
-              src={frame}
-              alt={`Frame ${index}`}
-              width="192"
-              height="192"
-            />
-          ))}
+      </div>
+      <div className=" p-3 flex gap-4">
+        <div className="flex flex-col gap-4">
+          {transcriptChunks &&
+            transcriptChunks.map((chunk, index) => {
+              return (
+                <div key={index}>
+                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
+                    <h3 className="text-lg font-medium">Part {index}:</h3>
+                    <pre className="text-sm whitespace-pre-wrap break-words">
+                      {chunk}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+        <div className="flex flex-col gap-4">
+          {blogPostChunks &&
+            blogPostChunks.map((chunk, index) => {
+              return (
+                <div key={index}>
+                  <div className="p-3 border rounded-md bg-muted text-muted-foreground max-w-xl">
+                    <h3 className="text-lg font-medium">Part {index}:</h3>
+                    <pre className="text-sm whitespace-pre-wrap break-words">
+                      {chunk}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default CaptureFrame;
+export default DemoPage;
