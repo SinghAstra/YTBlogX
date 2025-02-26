@@ -1,10 +1,12 @@
 "use client";
 
+import { FeatureSections } from "@/components/home/feature-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { siteConfig } from "@/config/site";
-import { Code, FileTextIcon, Rocket, YoutubeIcon } from "lucide-react";
+import { Code, FileTextIcon, Rocket } from "lucide-react";
 import { useState } from "react";
+import { FaYoutube } from "react-icons/fa";
 import "./globals.css";
 
 function App() {
@@ -61,11 +63,10 @@ function App() {
           </p>
         </div>
         <div className="flex items-center justify-center lg:w-[400px] xl:w-[600px]">
-          <div className="relative w-full h-[400px] perspective">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl"></div>
+          <div className="relative w-full h-[400px] ">
             <div className="absolute top-8 left-8 right-8 bottom-8 bg-card rounded-lg shadow-2xl transform rotate-6 z-10 p-6 border border-purple-500/20">
               <div className="flex items-center space-x-2 mb-4">
-                <YoutubeIcon className="h-6 w-6 text-red-500" />
+                <FaYoutube className="h-6 w-6 text-red-500" />
                 <div className="h-2 bg-muted rounded-full w-3/4"></div>
               </div>
               <div className="space-y-2">
@@ -74,7 +75,7 @@ function App() {
                 <div className="h-3 bg-muted rounded-full w-4/6"></div>
               </div>
             </div>
-            <div className="absolute top-12 left-12 right-12 bottom-12 bg-card rounded-lg shadow-2xl transform -rotate-3 z-20 p-6 border border-blue-500/20">
+            <div className="absolute top-10 left-10 right-10 bottom-10 bg-card rounded-lg shadow-2xl transform -rotate-6 z-20 p-6 border border-blue-500/20">
               <div className="flex items-center space-x-2 mb-4">
                 <FileTextIcon className="h-6 w-6 text-blue-500" />
                 <div className="h-2 bg-muted rounded-full w-3/4"></div>
@@ -99,6 +100,7 @@ function App() {
           </div>
         </div>
       </div>
+      <FeatureSections />
     </div>
   );
 }

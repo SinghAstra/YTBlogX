@@ -148,3 +148,10 @@ blog Blog @relation(fields: [blogId], references: [id])
     Purpose: Removes a video and all associated blogs and transcripts.
     UI Trigger:
     From /dashboard if you add a "Delete" button.
+
+I want to tell user about three features of my web app :
+📹 YouTube Integration — Fetch transcripts with one link.
+✂️ Smart Splitting — Break long transcripts into meaningful blog sections.
+✨ AI Summaries — Generate easy-to-read blog drafts for each part.
+I want you to build three different Feature Section by taking inspiration from SAAS
+make each of the different UI one tab option
