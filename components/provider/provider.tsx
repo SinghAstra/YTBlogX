@@ -1,5 +1,6 @@
 "use client";
 
+import { SessionProvider } from "next-auth/react";
 import React from "react";
 
 interface ProvidersProps {
@@ -8,9 +9,9 @@ interface ProvidersProps {
 
 const Providers = ({ children }: ProvidersProps) => {
   return (
-    // <SessionProvider>
-    <div>{children}</div>
-    // </SessionProvider>
+    <SessionProvider>
+      <div>{children}</div>
+    </SessionProvider>
   );
 };
 

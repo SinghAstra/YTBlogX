@@ -20,8 +20,6 @@ if (!googleClientId || !googleClientSecret) {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXT_AUTH_SECRET,
-
-  // Use Prisma as the adapter for storing user accounts
   adapter: PrismaAdapter(prisma),
 
   // Configure GitHub as the authentication provider

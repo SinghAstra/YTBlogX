@@ -1,34 +1,35 @@
 "use client";
 
-import { Icons } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/config/site";
-import { Code2, FileSearch, Lightbulb } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { Clock, History, Loader } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+
 const features = [
   {
-    title: "Functionality-based Exploration",
+    title: "Learning History Tracking",
     description:
-      "Explore and analyze code implementations based on their actual functionality.",
-    icon: Code2,
+      "Keep track of all your previously analyzed videos and revisit them whenever needed.",
+    icon: History,
   },
   {
-    title: "Comprehensive File Analysis",
+    title: "Time-Efficient Learning",
     description:
-      "Get concise summaries of individual code files and understand their purpose within the project.",
-    icon: FileSearch,
+      "Skip through hours of video content and get straight to the key concepts and code explanations.",
+    icon: Clock,
   },
   {
-    title: "Quick Feature Discovery",
+    title: "Real-time Processing",
     description:
-      "Rapidly identify and understand implemented features within repositories. ",
-    icon: Lightbulb,
+      "Watch as your video transforms into readable blog content with our streamlined processing system.",
+    icon: Loader,
   },
 ];
 
@@ -48,7 +49,11 @@ export default function SignIn() {
         redirect: true,
       });
     } catch (error) {
-      console.error("GitHub Sign-In Error:", error);
+      console.log("Error occurred during github sign in");
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
     } finally {
       setIsGithubLoading(false);
     }
@@ -62,7 +67,11 @@ export default function SignIn() {
         redirect: true,
       });
     } catch (error) {
-      console.log("Google Sign-In Error:", error);
+      console.log("Error occurred during google sign in");
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
     } finally {
       setIsGithubLoading(false);
     }
@@ -134,12 +143,12 @@ export default function SignIn() {
               >
                 {isGithubLoading ? (
                   <>
-                    <Icons.loader className="w-5 h-5 animate-spin" />
+                    <Loader className="w-5 h-5 animate-spin" />
                     Wait ...
                   </>
                 ) : (
                   <>
-                    <Icons.gitLogo className="mr-2 h-5 w-5" />
+                    <FaGithub className="mr-2 h-5 w-5" />
                     <span className="text-center">Continue with GitHub</span>
                     <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full ml-2 animate-pulse">
                       Recommended
@@ -167,7 +176,7 @@ export default function SignIn() {
               >
                 {isGoogleLoading ? (
                   <>
-                    <Icons.loader className="w-5 h-5 animate-spin" />
+                    <Loader className="w-5 h-5 animate-spin" />
                     Wait ...
                   </>
                 ) : (
