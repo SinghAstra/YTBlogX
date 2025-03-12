@@ -35,10 +35,11 @@ export function splitTranscript(transcript: string, chunkSize: number = 10000) {
 }
 
 export async function generateBlogContent(transcript: string) {
-  const genAI = new GoogleGenerativeAI(
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-  );
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    throw new Error("Gemini API key is required.");
+  }
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const chunks = splitTranscript(transcript, 8000);
   const blogContent = [];
@@ -48,6 +49,10 @@ export async function generateBlogContent(transcript: string) {
 
     try {
       const contentResponse = await model.generateContent(prompt);
+      console.log(
+        "contentResponse.response.text() is ",
+        contentResponse.response.text()
+      );
       const generatedText = contentResponse.response.text() || "";
       blogContent.push(generatedText + "\n\n");
     } catch (error) {

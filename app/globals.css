@@ -35,17 +35,6 @@ body {
     --chart-5: 340 75% 55%;
     /* Radius */
     --radius: 0.875rem;
-
-    --match-highlight: 214 95% 40%;
-    --match-highlight-border: 214 95% 50%;
-    --stats-blue: 210 40% 50%; /* Vibrant blue */
-    --stats-purple: 270 50% 50%; /* Deep purple */
-    --stats-pink: 330 60% 50%; /* Bright pink */
-    --stats-teal: 180 50% 40%; /* Teal green */
-    --stats-orange: 25 90% 50%; /* Warm orange */
-
-    --stats-green: 120 50% 40%; /* Verdant green */
-    --stats-red: 0 70% 50%;
   }
 }
 
@@ -89,23 +78,4 @@ body {
   *::-webkit-scrollbar-corner {
     background: transparent;
   }
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px hsl(var(--background)) inset !important;
-  -webkit-text-fill-color: hsl(var(--foreground)) !important;
-  caret-color: hsl(var(--foreground)) !important;
-  box-shadow: 0 0 0 30px hsl(var(--background)) inset !important;
-}
-
-input:-webkit-autofill:not(:focus) {
-  -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
-  -webkit-text-fill-color: hsl(var(--foreground)) !important;
-}
-
-.bg-grid-white {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' width='64' height='64' fill='none' stroke='rgb(255 255 255 / 0.02)'%3e%3cpath d='M0 .5H63.5V64'/%3e%3c/svg%3e");
 }

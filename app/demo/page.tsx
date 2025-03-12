@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { generateBlogContent, splitTranscript } from "@/lib/ai-processor";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
+import { toast } from "sonner";
 
 function DemoPage() {
   const [url, setUrl] = useState(
@@ -13,7 +13,6 @@ function DemoPage() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const { toast } = useToast();
   const [transcriptChunks, setTranscriptChunks] = useState<string[]>([]);
   const [blogPostChunks, setBlogPostChunks] = useState<string[]>([]);
 
@@ -57,11 +56,9 @@ function DemoPage() {
 
   useEffect(() => {
     if (!message) return;
-    toast({
-      title: message,
-    });
+    toast(message);
     setMessage(null);
-  }, [toast, message]);
+  }, [message]);
 
   return (
     <div className="flex flex-col gap-4 items-center justify-center min-h-screen bg-background text-foreground p-4">
