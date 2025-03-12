@@ -128,7 +128,7 @@ export default function SignIn() {
 
           <div className="w-full max-w-md p-8 bg-card/50 backdrop-blur-sm rounded-md border space-y-6">
             <div className="space-y-2 text-center">
-              <MagicBadge title="Sign In" />
+              <MagicBadge title={`Welcome to ${siteConfig.name}`} />
             </div>
 
             <div className="space-y-4">
