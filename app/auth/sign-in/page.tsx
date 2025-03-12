@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import AnimationContainer from "@/components/global/animation-container";
+import MagicBadge from "@/components/ui/magic-badge";
 import { Clock, History, Loader } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
@@ -93,20 +95,21 @@ export default function SignIn() {
 
           <div className="space-y-4 max-w-2xl p-6">
             {features.map((feature, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-4 p-4 rounded-lg border backdrop-blur-md"
-              >
-                <div className="p-2 rounded-md border">
-                  <feature.icon />
+              <AnimationContainer key={i} delay={i * 0.2}>
+                <div className="flex items-start gap-4 p-4 rounded-lg border backdrop-blur-md">
+                  <div className="p-2 rounded-md border">
+                    <feature.icon />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-              </div>
+              </AnimationContainer>
             ))}
           </div>
 
@@ -125,13 +128,7 @@ export default function SignIn() {
 
           <div className="w-full max-w-md p-8 bg-card/50 backdrop-blur-sm rounded-md border space-y-6">
             <div className="space-y-2 text-center">
-              <h2 className="text-2xl font-semibold">
-                Welcome to{" "}
-                <span className="text-primary">{siteConfig.name}</span>
-              </h2>
-              <p className="text-muted-foreground">
-                Sign in to start analyzing your repositories
-              </p>
+              <MagicBadge title="Sign In" />
             </div>
 
             <div className="space-y-4">

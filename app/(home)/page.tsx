@@ -57,7 +57,7 @@ const HomePage = () => {
                 <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
               </span>
             </button>
-            <h1 className="text-foreground text-center py-6 text-3xl font-medium text-balance sm:text-4xl md:text-5xl lg:text-6xl  w-full">
+            <h1 className="text-foreground text-center py-6 text-3xl height font-medium text-balance sm:text-4xl md:text-5xl lg:text-7xl  w-full">
               Transforming <br />
               <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc">
                 Youtube Learning
