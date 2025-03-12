@@ -1,4 +1,4 @@
-import { SiteConfig } from "@/types/site";
+import { SiteConfig } from "@/interfaces/site";
 
 export const siteConfig: SiteConfig = {
   name: "YTBlogX",
