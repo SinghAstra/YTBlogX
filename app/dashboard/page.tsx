@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { SearchIcon, SparklesIcon, X } from "lucide-react";
+import { SearchIcon, SparklesIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
@@ -18,13 +18,11 @@ function CommandPaletteRepoForm() {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const formRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const actionQuery = searchParams.get("action");
   const router = useRouter();
 
   useEffect(() => {
     if (actionQuery === "convert") {
-      inputRef.current?.focus();
       setShowGuide(true);
     }
   }, [actionQuery]);
@@ -86,7 +84,6 @@ function CommandPaletteRepoForm() {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check for Ctrl+K or Cmd+K
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        inputRef.current?.focus();
         e.preventDefault();
         setShowGuide(true);
       }
@@ -132,10 +129,10 @@ function CommandPaletteRepoForm() {
           <div className="relative w-full h-full  flex items-center justify-center backdrop-blur-sm">
             <motion.div
               className={`bg-muted/30 rounded-xl border w-full max-w-lg`}
-              initial={{ opacity: 0, y: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 80 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 0.2,
+                duration: 0.4,
                 ease: "easeInOut",
                 type: "spring",
                 stiffness: 260,
@@ -153,7 +150,6 @@ function CommandPaletteRepoForm() {
                     onChange={(e) => {
                       setUrl(e.target.value);
                     }}
-                    ref={inputRef}
                     disabled={isProcessing}
                     className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground"
                   />
