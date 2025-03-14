@@ -105,14 +105,6 @@ export async function POST(req: NextRequest) {
 
     await processBatchTranscriptSummaries(video.id);
 
-    const updatedBlogs = await prisma.blog.findMany({
-      where: {
-        videoId: video.id,
-      },
-    });
-
-    console.log("updatedBlogs is ", updatedBlogs);
-
     await generateVideoOverview(video.id);
 
     const videoWithBlogs = await prisma.video.findUnique({
@@ -142,24 +134,34 @@ export async function POST(req: NextRequest) {
     // Create a combined string of all summaries for context
     const allSummaries = blogs
       .filter((blog) => blog.summary) // Only include blogs with summaries
-      .map((blog) => `Segment ${blog.id}: ${blog.summary}`)
+      .map((blog) => `${blog.summary}`)
       .join("\n\n");
 
     for (const blog of blogs) {
       if (blog.transcript) {
-        const content = await generateBlogContent(
+        const blogData = await generateBlogContent(
           overview,
           allSummaries,
           blog.transcript
         );
 
-        // Update the blog with generated content
+        // Update the blog with both title and content
         await prisma.blog.update({
           where: { id: blog.id },
-          data: { content },
+          data: {
+            content: blogData,
+          },
         });
       }
     }
+
+    const updatedBlogs = await prisma.blog.findMany({
+      where: {
+        videoId: video.id,
+      },
+    });
+
+    console.log("updatedBlogs is ", updatedBlogs);
 
     return NextResponse.json(
       { message: "Video processing started" },

@@ -38,7 +38,7 @@ export function LeftSidebar() {
     setMessage(null);
   }, [message]);
   return (
-    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r pt-16 flex flex-col h-screen">
+    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r border-dotted pt-16 flex flex-col h-screen">
       <SidebarRepoHeader />
       {isFetchingVideos ? (
         <div className="flex flex-col gap-2 flex-1 overflow-auto p-2">

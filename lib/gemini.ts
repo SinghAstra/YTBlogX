@@ -136,6 +136,7 @@ async function generateSummaries(
       Return your response as a JSON array of objects, each with 'id' and 'summary' properties.
       Format your entire response as valid JSON with no additional text before or after.
 
+
        Example of what your response should look like:
       [{"id":"123","summary":"This is the first summary"},{"id":"456","summary":"This is the second summary"}]
       
@@ -279,6 +280,7 @@ export async function generateBlogContent(
       generate a well-structured, context-aware blog post content in markdown format.
       Write in a friendly and engaging tone suitable for beginners.
       If the segment is incomplete, infer the intent or note that the explanation continues in the next segment.
+
       The content should be engaging, informative, detailed and 
       should reference relevant context from other summaries when appropriate.
       
