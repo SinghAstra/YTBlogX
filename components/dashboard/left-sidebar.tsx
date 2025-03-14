@@ -1,6 +1,8 @@
 import { Video } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import SidebarRepoHeader from "./left-sidebar-repo-header";
+import VideoCardSkeleton from "./skeleton/video-card-skeleton";
 import VideoCard from "./video-card";
 
 export function LeftSidebar() {
@@ -36,9 +38,14 @@ export function LeftSidebar() {
     setMessage(null);
   }, [message]);
   return (
-    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r pt-20 flex flex-col h-screen">
+    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r pt-16 flex flex-col h-screen">
+      <SidebarRepoHeader />
       {isFetchingVideos ? (
-        <p>Fetching Videos</p>
+        <div className="flex flex-col gap-2 flex-1 overflow-auto p-2">
+          {[1, 2, 3, 4].map((i) => (
+            <VideoCardSkeleton key={i} />
+          ))}
+        </div>
       ) : videos && videos.length > 0 ? (
         <div className="flex flex-col gap-2 flex-1 overflow-auto p-2">
           {videos.map((video) => {

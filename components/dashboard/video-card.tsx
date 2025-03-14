@@ -1,6 +1,9 @@
 import { Video } from "@prisma/client";
+import { UserIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 function convertISO8601ToTime(duration: string) {
   const hoursMatch = duration.match(/(\d+)H/);
@@ -27,30 +30,40 @@ interface VideoCardProps {
 
 const VideoCard = ({ video }: VideoCardProps) => {
   return (
-    <div className="p-2 flex gap-2 flex-col border rounded-sm">
-      <div className="relative w-full h-[200px] group">
-        <Image
-          src={video.videoThumbnail}
-          alt={video.title}
-          fill
-          className="rounded-sm "
-        />
-        <div className="absolute bottom-2 right-2 rounded-sm bg-black tracking-wider text-xs p-1 transition-all duration-150 opacity-0 group-hover:opacity-100">
-          {convertISO8601ToTime(video.duration)}
-        </div>
-      </div>
-      <div className="flex gap-2 items-center">
-        <div className="relative w-8 h-8">
+    <Link href={`/video/${video.id}`}>
+      <div className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200">
+        <div className="relative w-full h-[200px] ">
           <Image
-            src={video.channelThumbnail}
+            src={video.videoThumbnail}
             alt={video.title}
             fill
-            className="rounded-full"
+            className="rounded-sm object-cover "
           />
+          <div className="absolute bottom-2 right-2 rounded-sm bg-black tracking-wider text-xs p-1 transition-all  opacity-0 group-hover:opacity-100">
+            {convertISO8601ToTime(video.duration)}
+          </div>
         </div>
-        <h3 className="text-sm tracking-wide">{video.title}</h3>
+        <div className="flex gap-2 items-center">
+          <div className="relative w-8 h-8">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={video.channelThumbnail}
+                alt={video.channelName || "Channel"}
+              />
+              <AvatarFallback>
+                <UserIcon className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm  line-clamp-2 leading-tight">
+              {video.title}
+            </h3>
+            <p className="text-xs text-muted-foreground">{video.channelName}</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
