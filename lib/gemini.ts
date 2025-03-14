@@ -17,7 +17,7 @@ const TOKEN_LIMIT = 800000;
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
 // Function to process transcripts in batches
-export async function processBatchTranscriptSummaries(
+export async function processBatchTranscriptSummariesAndTitle(
   videoId: string,
   batchSize: number = 10
 ) {
@@ -54,23 +54,24 @@ export async function processBatchTranscriptSummaries(
       }));
 
       // Generate summaries
-      const summaries = await generateSummaries(transcriptBatch);
+      const titlesAndSummaries = await generateSummaries(transcriptBatch);
 
       // Validate and update summaries
-      if (summaries && Array.isArray(summaries)) {
-        const validSummaries = summaries.filter(
-          (summary) =>
-            summary &&
-            typeof summary.id === "string" &&
-            typeof summary.summary === "string" &&
-            batch.some((blog) => blog.id === summary.id)
+      if (titlesAndSummaries && Array.isArray(titlesAndSummaries)) {
+        const validTitlesAndSummaries = titlesAndSummaries.filter(
+          (titlesAndSummary) =>
+            titlesAndSummary &&
+            typeof titlesAndSummary.id === "string" &&
+            typeof titlesAndSummary.summary === "string" &&
+            typeof titlesAndSummary.title === "string" &&
+            batch.some((blog) => blog.id === titlesAndSummary.id)
         );
 
-        if (validSummaries.length > 0) {
+        if (validTitlesAndSummaries.length > 0) {
           // Update database with transaction
-          await updateSummaries(validSummaries);
+          await updateTitlesAndSummaries(validTitlesAndSummaries);
           console.log(
-            `Successfully updated ${validSummaries.length} summaries`
+            `Successfully updated ${validTitlesAndSummaries.length} blogs with title and summary`
           );
         }
       }
@@ -130,15 +131,22 @@ async function generateSummaries(
     console.log("tokenConsumed: ", tokenConsumed);
 
     const prompt = `
-      You are a concise summarizer. I will provide you with an array of transcript segments from a YouTube video.
-      For each segment, generate a 2-4 line summary that captures the key points.
+      You are a concise summarizer and title generator. 
+      I will provide you with an array of transcript segments from a YouTube video. 
       
-      Return your response as a JSON array of objects, each with 'id' and 'summary' properties.
+      For each segment:
+      - Generate a short, engaging title (max 10 words).
+      - Provide a 2-4 line summary capturing the key points.
+      
+      Return your response as a JSON array of objects, ensuring:
+      - Each object contains 'id', 'title', and 'summary' properties.
+      - All keys and values are strings — the entire JSON must be valid for direct parsing with JSON.parse().
+
       Format your entire response as valid JSON with no additional text before or after.
 
-
-       Example of what your response should look like:
-      [{"id":"123","summary":"This is the first summary"},{"id":"456","summary":"This is the second summary"}]
+      Example:
+      [{"id":"123","title":"Introduction to AI","summary":"This section explains what AI is and its importance."},
+       {"id":"456","title":"Key Challenges in AI","summary":"It discusses the main challenges AI researchers face."}]
       
       Here are the transcript segments:
       ${JSON.stringify(transcriptBatch)}
@@ -155,29 +163,35 @@ async function generateSummaries(
       .trim(); // Remove leading/trailing whitespace
 
     console.log("Cleaned responseText:", responseText); // Log cleaned response
+    console.log("typeof responseText is ", typeof responseText);
 
-    const summaries = JSON.parse(responseText);
+    const titlesAndSummaries = JSON.parse(responseText);
 
     // Validate that we got an array of objects with id and summary
-    if (!Array.isArray(summaries)) {
+    if (!Array.isArray(titlesAndSummaries)) {
       throw new Error("Response is not an array");
     }
 
-    console.log("summaries is ", summaries);
+    console.log("titlesAndSummaries is ", titlesAndSummaries);
 
-    return summaries;
+    return titlesAndSummaries;
   } catch (error) {
-    console.error("Error generating summaries:", error);
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
     return [];
   }
 }
 
 // Function to update summaries in the database
-async function updateSummaries(summaries: { id: string; summary: string }[]) {
-  const updatePromises = summaries.map(({ id, summary }) =>
+async function updateTitlesAndSummaries(
+  summaries: { id: string; summary: string; title: string }[]
+) {
+  const updatePromises = summaries.map(({ id, summary, title }) =>
     prisma.blog.update({
       where: { id },
-      data: { summary },
+      data: { summary, title },
     })
   );
 

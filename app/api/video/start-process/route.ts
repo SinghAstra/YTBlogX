@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth-options";
 import {
   generateBlogContent,
   generateVideoOverview,
-  processBatchTranscriptSummaries,
+  processBatchTranscriptSummariesAndTitle,
 } from "@/lib/gemini";
 import { prisma } from "@/lib/prisma";
 import { splitTranscript } from "@/lib/split-transcript";
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.$transaction(createTranscript);
 
-    await processBatchTranscriptSummaries(video.id);
+    await processBatchTranscriptSummariesAndTitle(video.id);
 
     await generateVideoOverview(video.id);
 
