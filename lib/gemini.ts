@@ -53,23 +53,6 @@ export async function processBatchTranscriptSummaries(
         transcript: blog.transcript,
       }));
 
-      // Check token consumption and wait if necessary
-      if (tokenConsumed >= TOKEN_LIMIT) {
-        console.log(
-          `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
-        );
-        await sleep();
-        tokenConsumed = 0;
-      }
-
-      // Estimate token consumption for this batch (rough estimate)
-      // Assuming approximately 1 token per 4 characters
-      const estimatedTokens = batch.reduce(
-        (total, blog) => total + Math.ceil(blog.transcript.length / 4),
-        0
-      );
-      tokenConsumed += estimatedTokens;
-
       // Generate summaries
       const summaries = await generateSummaries(transcriptBatch);
 
@@ -128,6 +111,24 @@ async function generateSummaries(
   transcriptBatch: { id: string; transcript: string }[]
 ) {
   try {
+    // Check token consumption and wait if necessary
+    if (tokenConsumed >= TOKEN_LIMIT) {
+      console.log(
+        `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
+      );
+      await sleep();
+      tokenConsumed = 0;
+    }
+
+    // Estimate token consumption for this batch (rough estimate)
+    // Assuming approximately 1 token per 4 characters
+    const estimatedTokens = transcriptBatch.reduce(
+      (total, blog) => total + Math.ceil(blog.transcript.length / 4),
+      0
+    );
+    tokenConsumed += estimatedTokens;
+    console.log("tokenConsumed: ", tokenConsumed);
+
     const prompt = `
       You are a concise summarizer. I will provide you with an array of transcript segments from a YouTube video.
       For each segment, generate a 2-4 line summary that captures the key points.
@@ -222,6 +223,22 @@ export async function generateVideoOverview(videoId: string) {
       ${summariesText}
     `;
 
+    // Check token consumption and wait if necessary
+    if (tokenConsumed >= TOKEN_LIMIT) {
+      console.log(
+        `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
+      );
+      await sleep();
+      tokenConsumed = 0;
+    }
+
+    // Estimate token consumption for this batch (rough estimate)
+    // Assuming approximately 1 token per 4 characters
+    const estimatedTokens = prompt.length / 4;
+    tokenConsumed += estimatedTokens;
+
+    console.log("tokenConsumed: ", tokenConsumed);
+
     // Generate the overview using Gemini API
     const result = await model.generateContent(prompt);
     const overview = result.response.text().trim();
@@ -247,5 +264,54 @@ export async function generateVideoOverview(videoId: string) {
       message:
         error instanceof Error ? error.message : "Unknown error occurred",
     };
+  }
+}
+
+export async function generateBlogContent(
+  overview: string,
+  allSummaries: string,
+  transcript: string
+) {
+  try {
+    const prompt = `
+      You are a professional blog writer. Using the provided video overview, 
+      a collection of all segment summaries for context, and the specific transcript segment,
+      generate a well-structured, context-aware blog post content in markdown format.
+      Write in a friendly and engaging tone suitable for beginners.
+      If the segment is incomplete, infer the intent or note that the explanation continues in the next segment.
+      The content should be engaging, informative, detailed and 
+      should reference relevant context from other summaries when appropriate.
+      
+      Video Overview: ${overview}
+      All Segment Summaries (for context): ${allSummaries}
+      Specific Transcript Segment (focus of this blog): ${transcript}
+      
+      Return only the markdown content with no additional text or explanations.
+    `;
+
+    // Check token consumption and wait if necessary
+    if (tokenConsumed >= TOKEN_LIMIT) {
+      console.log(
+        `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
+      );
+      await sleep();
+      tokenConsumed = 0;
+    }
+
+    // Estimate token consumption for this batch (rough estimate)
+    // Assuming approximately 1 token per 4 characters
+    const estimatedTokens = prompt.length / 4;
+    tokenConsumed += estimatedTokens;
+
+    console.log("tokenConsumed: ", tokenConsumed);
+    const result = await model.generateContent(prompt);
+    const blogContent = result.response.text().trim();
+    console.log(`Generated blog content :`, blogContent);
+    return blogContent;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth-options";
 import {
+  generateBlogContent,
   generateVideoOverview,
   processBatchTranscriptSummaries,
 } from "@/lib/gemini";
@@ -113,6 +114,52 @@ export async function POST(req: NextRequest) {
     console.log("updatedBlogs is ", updatedBlogs);
 
     await generateVideoOverview(video.id);
+
+    const videoWithBlogs = await prisma.video.findUnique({
+      where: { id: video.id },
+      select: {
+        overview: true,
+        blogs: {
+          select: {
+            id: true,
+            summary: true,
+            transcript: true,
+          },
+        },
+      },
+    });
+
+    if (!videoWithBlogs || !videoWithBlogs.overview) {
+      return NextResponse.json(
+        { message: "Video or overview not found" },
+        { status: 404 }
+      );
+    }
+
+    const overview = videoWithBlogs.overview;
+    const blogs = videoWithBlogs.blogs;
+
+    // Create a combined string of all summaries for context
+    const allSummaries = blogs
+      .filter((blog) => blog.summary) // Only include blogs with summaries
+      .map((blog) => `Segment ${blog.id}: ${blog.summary}`)
+      .join("\n\n");
+
+    for (const blog of blogs) {
+      if (blog.transcript) {
+        const content = await generateBlogContent(
+          overview,
+          allSummaries,
+          blog.transcript
+        );
+
+        // Update the blog with generated content
+        await prisma.blog.update({
+          where: { id: blog.id },
+          data: { content },
+        });
+      }
+    }
 
     return NextResponse.json(
       { message: "Video processing started" },
