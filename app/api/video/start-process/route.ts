@@ -1,19 +1,22 @@
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return NextResponse.json(
-    //     { message: "Sign In to Get Started" },
-    //     { status: 401 }
-    //   );
-    // }
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { message: "Sign In to Get Started" },
+        { status: 401 }
+      );
+    }
 
-    const videoUrl = searchParams.get("videoUrl");
+    const body = await req.json();
+    const { videoUrl } = body;
 
     if (!videoUrl) {
       return NextResponse.json(
@@ -24,7 +27,6 @@ export async function GET(req: NextRequest) {
 
     // Extract YouTube video ID from URL
     const youtubeId = new URL(videoUrl).searchParams.get("v");
-    console.log(`YouTube video ID: ${youtubeId}`);
     if (!youtubeId) {
       return NextResponse.json(
         { message: "Invalid YouTube video URL" },
@@ -32,57 +34,52 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("YOUTUBE_API_KEY is ", YOUTUBE_API_KEY);
-
     // Fetch video data from YouTube API
-    const ytResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?id=${youtubeId}&key=${YOUTUBE_API_KEY}`
+    const ytVideoResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${youtubeId}&key=${YOUTUBE_API_KEY}`
     );
 
-    const ytData = await ytResponse.json();
-
-    console.log("ytData is", ytData);
-
-    if (!ytData.items || ytData.items.length === 0) {
+    const ytVideoData = await ytVideoResponse.json();
+    if (!ytVideoData.items || ytVideoData.items.length === 0) {
       return NextResponse.json(
-        { error: "Video not found on YouTube" },
+        { message: "Video not found on YouTube" },
         { status: 404 }
       );
     }
 
-    const videoData = ytData.items[0];
+    const videoData = ytVideoData.items[0];
     const {
       title,
       channelTitle: channelName,
       thumbnails,
-      contentDetails,
+      channelId,
     } = videoData.snippet;
-    const thumbnailUrl = thumbnails.high.url;
-    const duration = contentDetails.duration;
+    const videoThumbnail = thumbnails.high.url;
+    const duration = videoData.contentDetails.duration;
 
-    const obj = {
-      youtubeId,
-      title,
-      channelName,
-      thumbnailUrl,
-      duration,
-      processingState: "PENDING",
-    };
+    const ytChannelResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
+    );
 
-    console.log("obj is ", obj);
+    const ytChannelData = await ytChannelResponse.json();
+    const channelData = ytChannelData.items[0];
+    const channelThumbnail = channelData.snippet.thumbnails.high.url;
 
     // Save new video to DB
-    // const video = await prisma.video.create({
-    //   data: {
-    //     youtubeId,
-    //     userId: session.user.id,
-    //     title,
-    //     channelName,
-    //     thumbnailUrl,
-    //     duration,
-    //     processingState: "PENDING",
-    //   },
-    // });
+    const video = await prisma.video.create({
+      data: {
+        youtubeId,
+        userId: session.user.id,
+        title,
+        channelName,
+        videoThumbnail,
+        channelThumbnail,
+        duration,
+        processingState: "PENDING",
+      },
+    });
+
+    console.log("video is ", video);
 
     return NextResponse.json(
       { message: "Video processing started" },

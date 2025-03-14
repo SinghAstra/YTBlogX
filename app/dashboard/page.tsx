@@ -13,7 +13,6 @@ function CommandPaletteRepoForm() {
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const searchParams = useSearchParams();
   const pathName = usePathname();
@@ -36,48 +35,34 @@ function CommandPaletteRepoForm() {
     //   return;
     // }
 
-    // setIsProcessing(true);
+    setIsProcessing(true);
 
-    // try {
-    //   const response = await fetch("/api/repository/process", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ githubUrl: url }),
-    //   });
+    try {
+      const response = await fetch("/api/video/start-process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ videoUrl: url }),
+      });
 
-    //   const data = await response.json();
-    //   if (!response.ok) {
-    //     setMessage(data.message || "Failed to process repository");
-    //   }
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.message || "Failed to process video");
+      }
 
-    //   console.log("data --repositoryProcess is ", data);
+      // dispatch(addUserRepository(repoDetailsData.repository));
 
-    //   const responseRepoDetails = await fetch(
-    //     `/api/repository/${data.repositoryId}`
-    //   );
-    //   const repoDetailsData = await responseRepoDetails.json();
-    //   if (!responseRepoDetails.ok) {
-    //     setMessage(
-    //       repoDetailsData.message || "Failed to fetch repository details"
-    //     );
-    //   }
-    //   dispatch(addUserRepository(repoDetailsData.repository));
-
-    //   setIsSuccess(true);
-    //   setUrl("");
-
-    //   setTimeout(() => setIsSuccess(false), 3000);
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     console.log("error.stack is ", error.stack);
-    //     console.log("error.message is ", error.message);
-    //   }
-    //   setMessage("Check Your Network Connection");
-    // } finally {
-    //   setIsProcessing(false);
-    // }
+      setUrl("");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
+      setMessage("Check Your Network Connection");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   useEffect(() => {
@@ -166,19 +151,11 @@ function CommandPaletteRepoForm() {
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      disabled={!url || isProcessing || isSuccess}
+                      disabled={!url || isProcessing}
                       type="submit"
-                      className={cn(
-                        "relative overflow-hidden",
-                        isSuccess && "bg-yellow-400 "
-                      )}
+                      className={cn("relative overflow-hidden")}
                     >
-                      {isSuccess ? (
-                        <div className="flex items-center">
-                          <FaSpinner className="mr-2 h-5 w-5 animate-spin" />
-                          Processing Started...
-                        </div>
-                      ) : isProcessing ? (
+                      {isProcessing ? (
                         <div className="flex items-center">
                           <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
                           Processing...
@@ -226,19 +203,11 @@ function CommandPaletteRepoForm() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                disabled={!url || isProcessing || isSuccess}
+                disabled={!url || isProcessing}
                 type="submit"
-                className={cn(
-                  "relative overflow-hidden",
-                  isSuccess && "bg-yellow-400 "
-                )}
+                className={cn("relative overflow-hidden")}
               >
-                {isSuccess ? (
-                  <div className="flex items-center">
-                    <FaSpinner className="mr-2 h-5 w-5 animate-spin" />
-                    Processing Started...
-                  </div>
-                ) : isProcessing ? (
+                {isProcessing ? (
                   <div className="flex items-center">
                     <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
                     Processing...

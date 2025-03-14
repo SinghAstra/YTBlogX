@@ -57,17 +57,17 @@ model VerificationToken {
 }
 
 model Video {
-  id           String @id @default(cuid())
-  youtubeId    String @unique
-  title        String
-  channelName  String
-  thumbnailUrl String
-  duration     String // Duration in ISO 8601 format
-  hasTranscript Boolean @default(true)
-  createdAt    DateTime @default(now())
-  userId       String  
-  processingState VideoProcessingState @default(PENDING)
-  overview     String? @db.Text // Combined overview of all summarie
+  id                  String @id @default(cuid())
+  youtubeId           String @unique
+  title               String
+  channelName         String
+  videoThumbnail      String
+  channelThumbnail    String
+  duration            String // Duration in ISO 8601 format
+  userId              String  
+  processingState     VideoProcessingState @default(PENDING)
+  overview            String? @db.Text 
+  createdAt           DateTime @default(now())
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

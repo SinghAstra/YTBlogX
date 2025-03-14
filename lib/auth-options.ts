@@ -10,6 +10,8 @@ const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
+const nextAuthSecret = process.env.NEXT_AUTH_SECRET;
+
 if (!githubClientId || !githubClientSecret) {
   throw new Error("GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET must be provided");
 }
@@ -18,8 +20,12 @@ if (!googleClientId || !googleClientSecret) {
   throw new Error("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be provided");
 }
 
+if (!nextAuthSecret) {
+  throw new Error("NEXT_AUTH_SECRET must be provided.");
+}
+
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: nextAuthSecret,
   adapter: PrismaAdapter(prisma),
 
   // Configure GitHub as the authentication provider
