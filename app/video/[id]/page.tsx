@@ -39,7 +39,7 @@ export default async function VideoPage({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)] w-full">
+    <div className="flex flex-col lg:flex-row">
       {/* Left sidebar - Video info */}
       <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto">
         <div className="space-y-4">
@@ -94,12 +94,10 @@ export default async function VideoPage({
       </div>
 
       {/* Right side - Blog segments */}
-      <div className="lg:w-2/3 lg:ml-[33.333333%] p-4">
+      <div className="lg:w-2/3 lg:ml-[33.333333%] p-4 min-h-[calc(100vh-4rem)]">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6">Blog Segments</h2>
-
           {video.blogs && video.blogs.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="flex flex-col gap-4">
               {video.blogs.map((blog: any, index: number) => (
                 <Link href={`/video/${video.id}/blog/${blog.id}`} key={blog.id}>
                   <Card className="overflow-hidden transition-all hover:bg-secondary/50">
