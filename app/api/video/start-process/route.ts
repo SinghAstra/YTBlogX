@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       thumbnails,
       channelId,
     } = videoData.snippet;
-    const videoThumbnail = thumbnails.high.url;
+    const videoThumbnail = thumbnails.maxres.url;
     const duration = videoData.contentDetails.duration;
 
     const ytChannelResponse = await fetch(
@@ -63,6 +63,8 @@ export async function POST(req: NextRequest) {
 
     const ytChannelData = await ytChannelResponse.json();
     const channelData = ytChannelData.items[0];
+    console.log("channelData is ", channelData);
+
     const channelThumbnail = channelData.snippet.thumbnails.high.url;
 
     // Save new video to DB

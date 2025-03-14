@@ -58,7 +58,7 @@ model VerificationToken {
 
 model Video {
   id                  String @id @default(cuid())
-  youtubeId           String @unique
+  youtubeId           String 
   title               String
   channelName         String
   videoThumbnail      String

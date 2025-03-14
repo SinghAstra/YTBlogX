@@ -1,6 +1,7 @@
 import { Video } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import VideoCard from "./video-card";
 
 export function LeftSidebar() {
   const [videos, setVideos] = useState<Video[]>();
@@ -35,17 +36,15 @@ export function LeftSidebar() {
     setMessage(null);
   }, [message]);
   return (
-    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r pt-16 flex flex-col h-screen">
+    <div className="fixed inset-y-0 left-0 w-96 bg-background border-r pt-20 flex flex-col h-screen">
       {isFetchingVideos ? (
         <p>Fetching Videos</p>
       ) : videos && videos.length > 0 ? (
-        videos.map((video) => {
-          return (
-            <div key={video.id} className="border-b border-dotted py-4">
-              <h3>{video.title}</h3>
-            </div>
-          );
-        })
+        <div className="flex flex-col gap-2 flex-1 overflow-auto p-2">
+          {videos.map((video) => {
+            return <VideoCard key={video.id} video={video} />;
+          })}
+        </div>
       ) : (
         <p>You have no videos Get Started.</p>
       )}
