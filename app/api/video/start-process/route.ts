@@ -1,5 +1,10 @@
 import { authOptions } from "@/lib/auth-options";
+import {
+  generateVideoOverview,
+  processBatchTranscriptSummaries,
+} from "@/lib/gemini";
 import { prisma } from "@/lib/prisma";
+import { splitTranscript } from "@/lib/split-transcript";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { YoutubeTranscript } from "youtube-transcript";
@@ -85,7 +90,29 @@ export async function POST(req: NextRequest) {
 
     const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
     const transcript = transcriptData.map((entry) => entry.text).join(" ");
-    console.log("transcript is ", transcript);
+    const transcriptChunks = splitTranscript(transcript);
+    const createTranscript = transcriptChunks.map((chunk) => {
+      return prisma.blog.create({
+        data: {
+          transcript: chunk,
+          videoId: video.id,
+        },
+      });
+    });
+
+    await prisma.$transaction(createTranscript);
+
+    await processBatchTranscriptSummaries(video.id);
+
+    const updatedBlogs = await prisma.blog.findMany({
+      where: {
+        videoId: video.id,
+      },
+    });
+
+    console.log("updatedBlogs is ", updatedBlogs);
+
+    await generateVideoOverview(video.id);
 
     return NextResponse.json(
       { message: "Video processing started" },

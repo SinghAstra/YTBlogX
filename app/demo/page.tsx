@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { generateBlogContent, splitTranscript } from "@/lib/ai-processor";
+import { generateBlogContent, splitTranscript } from "@/lib/gemini";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
