@@ -39,7 +39,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
             fill
             className="rounded-sm object-cover "
           />
-          <div className="absolute bottom-2 right-2 rounded-sm bg-black tracking-wider text-xs p-1 transition-all  opacity-0 group-hover:opacity-100">
+          <div className="absolute bottom-2 right-2 rounded-sm bg-muted/80 tracking-wider text-xs py-1 px-2  transition-all  opacity-0 group-hover:opacity-100">
             {convertISO8601ToTime(video.duration)}
           </div>
         </div>

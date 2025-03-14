@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export function splitTranscript(transcript: string, chunkSize: number = 10000) {
-  const sentences = transcript.split(/(?<=[.!?])\s+/); // Split at sentence boundaries
+export function splitTranscript(transcript: string, chunkSize: number = 4000) {
+  const sentences = transcript.split(/(?<=[.!?])\s+/);
   const chunks = [];
   let currentChunk = "";
 

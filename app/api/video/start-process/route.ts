@@ -2,6 +2,7 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { YoutubeTranscript } from "youtube-transcript";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -63,7 +64,6 @@ export async function POST(req: NextRequest) {
 
     const ytChannelData = await ytChannelResponse.json();
     const channelData = ytChannelData.items[0];
-    console.log("channelData is ", channelData);
 
     const channelThumbnail = channelData.snippet.thumbnails.high.url;
 
@@ -82,6 +82,10 @@ export async function POST(req: NextRequest) {
     });
 
     console.log("video is ", video);
+
+    const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
+    const transcript = transcriptData.map((entry) => entry.text).join(" ");
+    console.log("transcript is ", transcript);
 
     return NextResponse.json(
       { message: "Video processing started" },

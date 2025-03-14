@@ -10,7 +10,9 @@ import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 
 function CommandPaletteRepoForm() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(
+    "https://www.youtube.com/watch?v=KzH1ovd4Ots&list=PLoROMvodv4rNH7qL6-efu_q2_bPuy0adh&index=1&t=3620s"
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
