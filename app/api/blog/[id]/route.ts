@@ -8,24 +8,18 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const video = await prisma.video.findUnique({
+    const blog = await prisma.blog.findUnique({
       where: { id },
       include: {
-        blogs: {
-          select: {
-            id: true,
-            title: true,
-            summary: true,
-          },
-        },
+        video: true,
       },
     });
 
-    if (!video) {
-      return NextResponse.json({ message: "Video not found" }, { status: 404 });
+    if (!blog) {
+      return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
 
-    return NextResponse.json(video);
+    return NextResponse.json(blog);
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);

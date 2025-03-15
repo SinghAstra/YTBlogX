@@ -20,7 +20,7 @@ const OverviewSection = ({ overview }: { overview: string | null }) => {
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
         <div className=" flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-muted/70 px-2 py-1 rounded-md mb-2 border border-dotted">
-          <h2 className="text-lg font-normal">Overview</h2>
+          <h2 className="text-md font-normal">Overview</h2>
           <Button variant="ghost" size="sm" className="p-0 h-8 w-8">
             {isOpen ? (
               <ChevronUp className="h-4 w-4" />

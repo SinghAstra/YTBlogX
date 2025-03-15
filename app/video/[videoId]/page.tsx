@@ -10,20 +10,24 @@ import OverviewSection from "./overview-section";
 
 async function getVideo(id: string) {
   try {
-    const res = await fetch(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/video/${id}`,
       {
         cache: "no-store",
       }
     );
+    const data = await response.json();
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch video");
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch video");
     }
 
-    return res.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching video:", error);
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
     return null;
   }
 }
@@ -31,9 +35,9 @@ async function getVideo(id: string) {
 export default async function VideoPage({
   params,
 }: {
-  params: { id: string };
+  params: { videoId: string };
 }) {
-  const video = await getVideo(params.id);
+  const video = await getVideo(params.videoId);
 
   if (!video) {
     notFound();
@@ -41,7 +45,7 @@ export default async function VideoPage({
 
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto">
+      <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto lg:border-dotted lg:border-r">
         <div className="space-y-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
             <Image
@@ -57,7 +61,7 @@ export default async function VideoPage({
           </div>
 
           {/* Video title */}
-          <h1 className="text-xl font-normal leading-tight">{video.title}</h1>
+          <h1 className="text-md font-normal leading-tight">{video.title}</h1>
 
           {/* Channel info */}
           <div className="flex items-center gap-2 border-b border-dotted pb-2">
