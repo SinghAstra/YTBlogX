@@ -1,11 +1,11 @@
-import { User, UserIcon } from "lucide-react";
+import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { convertISO8601ToTime } from "@/components/dashboard/video-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Blog } from "@prisma/client";
 import OverviewSection from "./overview-section";
 
 async function getVideo(id: string) {
@@ -79,51 +79,44 @@ export default async function VideoPage({
       </div>
 
       {/* Right side - Blog segments */}
-      <div className="lg:w-2/3 lg:ml-[33.333333%] p-4 ">
+      <div className="lg:w-2/3 lg:ml-[33vw] p-4 ">
         <div className="max-w-3xl mx-auto">
-          {video.blogs && video.blogs.length > 0 ? (
+          {video.blogs && video.blogs.length > 0 && (
             <div className="flex flex-col gap-4">
-              {video.blogs.map((blog: any, index: number) => (
+              {video.blogs.map((blog: Blog, index: number) => (
                 <Link href={`/video/${video.id}/blog/${blog.id}`} key={blog.id}>
-                  <Card className="overflow-hidden transition-all hover:bg-secondary/50">
-                    <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row">
-                        {/* Part banner */}
-                        <div className="relative h-32 md:h-auto md:w-1/3 bg-secondary">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-2xl font-bold">
-                              Part {index + 1}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Blog info */}
-                        <div className="p-4 md:w-2/3">
-                          <h3 className="font-semibold mb-2 line-clamp-2">
-                            {blog.title ||
-                              `Part ${index + 1} of "${video.title}"`}
-                          </h3>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {blog.summary ||
-                              "No summary available for this segment."}
-                          </p>
-                        </div>
+                  <div className="flex flex-col md:flex-row border border-dotted rounded-md overflow-hidden transition-all duration-200 hover:bg-secondary/50">
+                    {/* Part banner */}
+                    <div className="relative h-32 md:h-auto md:w-1/3">
+                      <Image
+                        src={video.videoThumbnail}
+                        alt={video.title}
+                        fill
+                        className="object-cover opacity-50"
+                        priority
+                      />
+                      {/* Overlay for better contrast */}
+                      <div className="absolute inset-0 bg-muted/40"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl font-normal bg-muted/30 px-4 py-1 rounded">
+                          Part {index + 1}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    {/* Blog info */}
+                    <div className="px-3 py-4 md:w-2/3">
+                      <h3 className="font-normal mb-2 line-clamp-2">
+                        {blog.title || `Part ${index + 1} of "${video.title}"`}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {blog.summary ||
+                          "No summary available for this segment."}
+                      </p>
+                    </div>
+                  </div>
                 </Link>
               ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="mb-4 text-muted-foreground">
-                <User className="h-12 w-12 mx-auto opacity-50" />
-              </div>
-              <h3 className="text-xl font-medium mb-2">No blog segments yet</h3>
-              <p className="text-muted-foreground">
-                The video is still being processed or no segments were
-                generated.
-              </p>
             </div>
           )}
         </div>
