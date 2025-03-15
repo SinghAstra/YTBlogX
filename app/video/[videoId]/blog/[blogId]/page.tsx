@@ -59,8 +59,9 @@ export default async function BlogPage({
   params: { videoId: string; blogId: string };
 }) {
   const blogData = await getBlogData(params.blogId);
-  // const mdxSource = await serialize(blogData.rawContent);
-  const mdxSource = await serialize("# Hello World\n\nThis is a test.");
+  console.log("blogData.content is ", blogData.content);
+  const mdxSource = await serialize(blogData.content);
+  // const mdxSource = await serialize("# Hello World\n\nThis is a test.");
 
   if (!blogData) {
     notFound();

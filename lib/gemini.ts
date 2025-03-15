@@ -111,26 +111,27 @@ export async function processBatchTranscriptSummariesAndTitle(
 async function generateSummaries(
   transcriptBatch: { id: string; transcript: string }[]
 ) {
-  try {
-    // Check token consumption and wait if necessary
-    if (tokenConsumed >= TOKEN_LIMIT) {
-      console.log(
-        `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
+  for (let i = 0; i < 5; i++) {
+    try {
+      // Check token consumption and wait if necessary
+      if (tokenConsumed >= TOKEN_LIMIT) {
+        console.log(
+          `Token limit reached (${tokenConsumed}). Cooling down for 1000ms`
+        );
+        await sleep();
+        tokenConsumed = 0;
+      }
+
+      // Estimate token consumption for this batch (rough estimate)
+      // Assuming approximately 1 token per 4 characters
+      const estimatedTokens = transcriptBatch.reduce(
+        (total, blog) => total + Math.ceil(blog.transcript.length / 4),
+        0
       );
-      await sleep();
-      tokenConsumed = 0;
-    }
+      tokenConsumed += estimatedTokens;
+      console.log("tokenConsumed: ", tokenConsumed);
 
-    // Estimate token consumption for this batch (rough estimate)
-    // Assuming approximately 1 token per 4 characters
-    const estimatedTokens = transcriptBatch.reduce(
-      (total, blog) => total + Math.ceil(blog.transcript.length / 4),
-      0
-    );
-    tokenConsumed += estimatedTokens;
-    console.log("tokenConsumed: ", tokenConsumed);
-
-    const prompt = `
+      const prompt = `
       You are a concise summarizer and title generator. 
       I will provide you with an array of transcript segments from a YouTube video. 
       
@@ -152,35 +153,49 @@ async function generateSummaries(
       ${JSON.stringify(transcriptBatch)}
     `;
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text();
-    console.log("Raw responseText:", responseText); // Log raw response for debugging
+      const result = await model.generateContent(prompt);
+      let responseText = result.response.text();
+      console.log("Raw responseText:", responseText); // Log raw response for debugging
 
-    // Remove potential Markdown or extra text
-    responseText = responseText
-      .replace(/```json/g, "") // Remove ```json
-      .replace(/```/g, "") // Remove ```
-      .trim(); // Remove leading/trailing whitespace
+      // Remove potential Markdown or extra text
+      responseText = responseText
+        .replace(/```json/g, "") // Remove ```json
+        .replace(/```/g, "") // Remove ```
+        .trim(); // Remove leading/trailing whitespace
 
-    console.log("Cleaned responseText:", responseText); // Log cleaned response
-    console.log("typeof responseText is ", typeof responseText);
+      console.log("Cleaned responseText:", responseText); // Log cleaned response
+      console.log("typeof responseText is ", typeof responseText);
 
-    const titlesAndSummaries = JSON.parse(responseText);
+      const titlesAndSummaries = JSON.parse(responseText);
 
-    // Validate that we got an array of objects with id and summary
-    if (!Array.isArray(titlesAndSummaries)) {
-      throw new Error("Response is not an array");
+      // Validate that we got an array of objects with id and summary
+      if (!Array.isArray(titlesAndSummaries)) {
+        throw new Error("Response is not an array");
+      }
+
+      console.log("titlesAndSummaries is ", titlesAndSummaries);
+
+      return titlesAndSummaries;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
+      if (
+        error instanceof Error &&
+        error.message.includes("Expected double-quoted property name in JSON")
+      ) {
+        console.log("--------------------------------");
+        console.log(`Syntax Error occurred. Trying again for ${i} time`);
+        console.log("--------------------------------");
+        continue;
+      } else {
+        console.log("--------------------------------");
+        console.log(`Non Syntax Error occurred.Aborting --generateSummaries`);
+        console.log("--------------------------------");
+        return [];
+      }
     }
-
-    console.log("titlesAndSummaries is ", titlesAndSummaries);
-
-    return titlesAndSummaries;
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log("error.stack is ", error.stack);
-      console.log("error.message is ", error.message);
-    }
-    return [];
   }
 }
 
