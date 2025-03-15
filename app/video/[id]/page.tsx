@@ -1,11 +1,12 @@
-import { Clock, User } from "lucide-react";
+import { User, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Badge } from "@/components/ui/badge";
+import { convertISO8601ToTime } from "@/components/dashboard/video-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import OverviewSection from "./overview-section";
 
 async function getVideo(id: string) {
   try {
@@ -40,61 +41,45 @@ export default async function VideoPage({
 
   return (
     <div className="flex flex-col lg:flex-row">
-      {/* Left sidebar - Video info */}
       <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto">
         <div className="space-y-4">
-          {/* Video thumbnail */}
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
             <Image
-              src={video.videoThumbnail || "/placeholder.svg"}
+              src={video.videoThumbnail}
               alt={video.title}
               fill
               className="object-cover"
               priority
             />
+            <div className="absolute bottom-2 right-2 rounded-sm bg-muted/80 tracking-wider text-xs py-1 px-2  ">
+              {convertISO8601ToTime(video.duration)}
+            </div>
           </div>
 
           {/* Video title */}
-          <h1 className="text-xl font-bold leading-tight">{video.title}</h1>
+          <h1 className="text-xl font-normal leading-tight">{video.title}</h1>
 
           {/* Channel info */}
-          <div className="flex items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full">
-              <Image
-                src={video.channelThumbnail || "/placeholder.svg"}
-                alt={video.channelName}
-                fill
-                className="object-cover"
+          <div className="flex items-center gap-2 border-b border-dotted pb-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={video.channelThumbnail}
+                alt={video.channelName || "Channel"}
               />
-            </div>
+              <AvatarFallback>
+                <UserIcon className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
             <span className="font-medium">{video.channelName}</span>
           </div>
 
-          {/* Video metadata */}
-          <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>{video.duration}</span>
-            </div>
-            <Badge variant="secondary" className="ml-auto">
-              {video.processingState}
-            </Badge>
-          </div>
-
-          <Separator />
-
           {/* Video overview */}
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Overview</h2>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">
-              {video.overview || "No overview available for this video."}
-            </p>
-          </div>
+          <OverviewSection overview={video.overview} />
         </div>
       </div>
 
       {/* Right side - Blog segments */}
-      <div className="lg:w-2/3 lg:ml-[33.333333%] p-4 min-h-[calc(100vh-4rem)]">
+      <div className="lg:w-2/3 lg:ml-[33.333333%] p-4 ">
         <div className="max-w-3xl mx-auto">
           {video.blogs && video.blogs.length > 0 ? (
             <div className="flex flex-col gap-4">

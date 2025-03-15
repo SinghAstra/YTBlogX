@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-function convertISO8601ToTime(duration: string) {
+export function convertISO8601ToTime(duration: string) {
   const hoursMatch = duration.match(/(\d+)H/);
   const minutesMatch = duration.match(/(\d+)M/);
   const secondsMatch = duration.match(/(\d+)S/);
@@ -44,17 +44,15 @@ const VideoCard = ({ video }: VideoCardProps) => {
           </div>
         </div>
         <div className="flex gap-2 items-center">
-          <div className="relative w-8 h-8">
-            <Avatar className="h-8 w-8">
-              <AvatarImage
-                src={video.channelThumbnail}
-                alt={video.channelName || "Channel"}
-              />
-              <AvatarFallback>
-                <UserIcon className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
-          </div>
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={video.channelThumbnail}
+              alt={video.channelName || "Channel"}
+            />
+            <AvatarFallback>
+              <UserIcon className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
           <div className="space-y-1">
             <h3 className="text-sm  line-clamp-2 leading-tight">
               {video.title}

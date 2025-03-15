@@ -9,9 +9,7 @@ const HomeLayout = ({ children }: Props) => {
   return (
     <div>
       <Navbar />
-      <main className="pt-16 min-h-screen border border-yellow-400">
-        {children}
-      </main>
+      <main className="pt-16 min-h-screen">{children}</main>
     </div>
   );
 };
