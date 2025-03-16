@@ -16,6 +16,10 @@ export async function GET(
             id: true,
             title: true,
             summary: true,
+            part: true,
+          },
+          orderBy: {
+            part: "asc",
           },
         },
       },

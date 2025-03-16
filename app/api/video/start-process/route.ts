@@ -92,11 +92,12 @@ export async function POST(req: NextRequest) {
     const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
     const transcript = transcriptData.map((entry) => entry.text).join(" ");
     const transcriptChunks = splitTranscript(transcript);
-    const createTranscript = transcriptChunks.map((chunk) => {
+    const createTranscript = transcriptChunks.map((chunk, index) => {
       return prisma.blog.create({
         data: {
           transcript: chunk,
           videoId: video.id,
+          part: index + 1,
         },
       });
     });

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import SidebarRepoHeader from "./left-sidebar-repo-header";
 import VideoCardSkeleton from "./skeleton/video-card-skeleton";
 import VideoCard from "./video-card";
+import EmptyLeftSidebar from "./empty/left-sidebar";
 
 export function LeftSidebar() {
   const [videos, setVideos] = useState<Video[]>();
@@ -53,7 +54,7 @@ export function LeftSidebar() {
           })}
         </div>
       ) : (
-        <p>You have no videos Get Started.</p>
+        <EmptyLeftSidebar/>
       )}
     </div>
   );

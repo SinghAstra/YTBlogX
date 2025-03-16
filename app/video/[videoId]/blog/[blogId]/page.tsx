@@ -24,7 +24,7 @@ function calculateReadingTime(
   return Math.max(1, Math.round(readingTime));
 }
 
-async function getBlogData(id: string) {
+async function getBlog(id: string) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/blog/${id}`,
@@ -32,12 +32,13 @@ async function getBlogData(id: string) {
         cache: "no-store",
       }
     );
+    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error("Failed to fetch blog data");
+      throw new Error(data.message || "Failed to fetch blog data");
     }
 
-    return response.json();
+    return data;
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
@@ -52,15 +53,15 @@ export default async function BlogPage({
 }: {
   params: { videoId: string; blogId: string };
 }) {
-  const blogData = await getBlogData(params.blogId);
-  console.log("blogData.content is ", blogData.content);
-  const mdxSource = await serialize(blogData.content);
+  const blog = await getBlog(params.blogId);
+  console.log("blog.content is ", blog.content);
+  const mdxSource = await serialize(blog.content);
 
-  if (!blogData) {
+  if (!blog) {
     notFound();
   }
 
-  const readingTime = calculateReadingTime(blogData.content);
+  const readingTime = calculateReadingTime(blog.content);
 
   return (
     <div className="flex flex-col  min-h-screen bg-background">
@@ -84,10 +85,10 @@ export default async function BlogPage({
           <div className="relative rounded-xl overflow-hidden w-full aspect-video">
             <Image
               src={
-                blogData.video.videoThumbnail ||
+                blog.video.videoThumbnail ||
                 "/placeholder.svg?height=720&width=1280"
               }
-              alt={blogData.video.title}
+              alt={blog.video.title}
               fill
               className="object-cover opacity-80"
               priority
@@ -96,10 +97,10 @@ export default async function BlogPage({
             <div className="absolute inset-0  flex items-center justify-center">
               <div className="text-center">
                 <span className="text-2xl font-normal bg-muted/80 px-4 py-1 rounded">
-                  Part 1
+                  Part {blog.part}
                 </span>
                 <h1 className="text-2xl font-normal bg-muted/80 px-4 py-1 rounded md:text-3xl ">
-                  {blogData.title || blogData.video.title}
+                  {blog.title || blog.video.title}
                 </h1>
               </div>
             </div>
@@ -107,16 +108,16 @@ export default async function BlogPage({
               <div className="relative h-10 w-10 rounded-full overflow-hidden">
                 <Image
                   src={
-                    blogData.video.channelThumbnail ||
+                    blog.video.channelThumbnail ||
                     "/placeholder.svg?height=80&width=80"
                   }
-                  alt={blogData.video.channelName}
+                  alt={blog.video.channelName}
                   fill
                   className="object-cover"
                 />
               </div>
               <div>
-                <div className="font-normal">{blogData.video.channelName}</div>
+                <div className="font-normal">{blog.video.channelName}</div>
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <Clock className="h-3 w-3" />
                   <span>
@@ -129,7 +130,7 @@ export default async function BlogPage({
 
           {/* Blog content */}
           <Card className="p-6 md:p-8 prose prose-slate dark:prose-invert max-w-none">
-            {blogData.content ? (
+            {blog.content ? (
               <MDXSource mdxSource={mdxSource} />
             ) : (
               <div className="text-muted-foreground italic">

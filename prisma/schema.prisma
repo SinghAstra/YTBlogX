@@ -84,6 +84,7 @@ enum VideoProcessingState {
 
 model Blog {
   id       String @id @default(cuid())
+  part      Int   
   videoId  String
   title    String?
   transcript String  @db.Text // Original transcript segment

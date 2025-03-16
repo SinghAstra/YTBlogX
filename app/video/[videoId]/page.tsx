@@ -103,7 +103,7 @@ export default async function VideoPage({
                       <div className="absolute inset-0 bg-muted/40"></div>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-2xl font-normal bg-muted/30 px-4 py-1 rounded">
-                          Part {index + 1}
+                          Part {blog.part}
                         </span>
                       </div>
                     </div>
