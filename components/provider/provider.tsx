@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import React from "react";
+import React, { Suspense } from "react";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -9,9 +9,11 @@ interface ProvidersProps {
 
 const Providers = ({ children }: ProvidersProps) => {
   return (
-    <SessionProvider>
-      <div>{children}</div>
-    </SessionProvider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <SessionProvider>
+        <div>{children}</div>
+      </SessionProvider>
+    </Suspense>
   );
 };
 
