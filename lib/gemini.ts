@@ -133,7 +133,7 @@ async function generateSummaries(
 
       const prompt = `
       You are a concise summarizer and title generator. 
-      I will provide you with an array of transcript segments from a YouTube video. 
+      I will provide you with an array of transcript from a YouTube video. 
       
       For each segment:
       - Generate a short, engaging title (max 10 words).
@@ -149,7 +149,7 @@ async function generateSummaries(
       [{"id":"123","title":"Introduction to AI","summary":"This section explains what AI is and its importance."},
        {"id":"456","title":"Key Challenges in AI","summary":"It discusses the main challenges AI researchers face."}]
       
-      Here are the transcript segments:
+      Here are the transcript :
       ${JSON.stringify(transcriptBatch)}
     `;
 
@@ -244,7 +244,7 @@ export async function generateVideoOverview(videoId: string) {
 
     // Construct the prompt for Gemini
     const prompt = `
-      You are an expert summarizer. Below is a collection of summaries from different segments of a video.
+      You are an expert summarizer. Below is a collection of summaries from different parts of a video.
       Your task is to generate a concise, cohesive overview of the entire video in 4-6 sentences.
       Focus on capturing the main themes, key points, and overall purpose of the video based on these summaries.
       Return only the plain text overview, with no additional formatting, labels, or explanations.
@@ -305,17 +305,17 @@ export async function generateBlogContent(
   try {
     const prompt = `
       You are a professional blog writer. Using the provided video overview, 
-      a collection of all segment summaries for context, and the specific transcript segment,
+      a collection of all blog summaries for context, and the specific transcript,
       generate a well-structured, context-aware blog post content in markdown format.
       Write in a friendly and engaging tone suitable for beginners.
-      If the segment is incomplete, infer the intent or note that the explanation continues in the next segment.
+      If the transcript is incomplete, infer the intent or note that the explanation continues in the next part.
 
       The content should be engaging, informative, detailed and 
       should reference relevant context from other summaries when appropriate.
       
       Video Overview: ${overview}
-      All Segment Summaries (for context): ${allSummaries}
-      Specific Transcript Segment (focus of this blog): ${transcript}
+      All blog Summaries (for context): ${allSummaries}
+      Specific Transcript (focus of this blog): ${transcript}
       
       Return only the markdown content with no additional text or explanations.
     `;
