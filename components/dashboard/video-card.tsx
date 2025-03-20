@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
 
 export function convertISO8601ToTime(duration: string) {
   const hoursMatch = duration.match(/(\d+)H/);
@@ -28,6 +29,16 @@ interface VideoCardProps {
   video: Video;
 }
 
+const getStatusColor = (status: VideoProcessingState) => {
+  if (status === "COMPLETED") {
+    return "border-green-500 text-green-500";
+  }
+  if (status.includes("FAILED")) {
+    return "border-red-500 text-red-500";
+  }
+  return "border-yellow-500 text-yellow-500";
+};
+
 const VideoCard = ({ video }: VideoCardProps) => {
   return (
     <Link
@@ -45,6 +56,21 @@ const VideoCard = ({ video }: VideoCardProps) => {
             fill
             className="rounded-sm object-cover "
           />
+          {video.processingState !== "COMPLETED" && (
+            <>
+              <div className="absolute inset-0 bg-muted/80"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Badge
+                  variant={"outline"}
+                  className={`border ${getStatusColor(
+                    video.processingState
+                  )} backdrop-blur-sm`}
+                >
+                  {video.processingState}
+                </Badge>
+              </div>
+            </>
+          )}
           <div className="absolute bottom-2 right-2 rounded-sm bg-muted/80 tracking-wider text-xs py-1 px-2  transition-all  opacity-0 group-hover:opacity-100">
             {convertISO8601ToTime(video.duration)}
           </div>

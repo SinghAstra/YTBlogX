@@ -14,6 +14,7 @@ const RepoProcessingLogs = () => {
   const router = useRouter();
   const [isFetchingVideo, setIsFetchingVideo] = useState(true);
   const videoId = params.videoId as string;
+  console.log("videoId is ", videoId);
   const [video, setVideo] = useState<Video>();
   const [logs, setLogs] = useState<ProcessingUpdate[]>([]);
   const [message, setMessage] = useState<string | null>(null);
@@ -28,9 +29,11 @@ const RepoProcessingLogs = () => {
           setMessage(data.message);
           return;
         }
-        setVideo(data.video);
+        setVideo(data);
 
-        if (data.video.processingState === "COMPLETED") {
+        console.log("data is ", data);
+
+        if (data.processingState === "COMPLETED") {
           console.log("data.repository.status is ", data.repository.status);
           router.replace(`/video/${videoId}`);
         }
@@ -45,7 +48,7 @@ const RepoProcessingLogs = () => {
       }
     };
     fetchVideo();
-  }, [video, videoId, setMessage, router]);
+  }, [videoId, setMessage, router]);
 
   useEffect(() => {
     if (!message) return;
