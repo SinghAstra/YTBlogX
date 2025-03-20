@@ -30,10 +30,7 @@ const RepoProcessingLogs = () => {
         }
         setVideo(data.video);
 
-        // I am setting here that video is data.video but it is asking me to make video optional
-        // Why it is not undefined anymore ?
-
-        if (video?.processingState === "COMPLETED") {
+        if (data.video.processingState === "COMPLETED") {
           console.log("data.repository.status is ", data.repository.status);
           router.replace(`/video/${videoId}`);
         }

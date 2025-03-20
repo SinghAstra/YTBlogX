@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
-  const { id } = await params;
+  const { videoId } = await params;
 
   try {
     const video = await prisma.video.findUnique({
-      where: { id },
+      where: { id: videoId },
       include: {
         blogs: {
           select: {
