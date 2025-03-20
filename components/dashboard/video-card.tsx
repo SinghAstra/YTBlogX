@@ -1,4 +1,4 @@
-import { Video } from "@prisma/client";
+import { Video, VideoProcessingState } from "@prisma/client";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +30,13 @@ interface VideoCardProps {
 
 const VideoCard = ({ video }: VideoCardProps) => {
   return (
-    <Link href={`/video/${video.id}`}>
+    <Link
+      href={
+        video.processingState === VideoProcessingState.COMPLETED
+          ? `/video/${video.id}`
+          : `/logs/${video.id}`
+      }
+    >
       <div className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200">
         <div className="relative w-full h-[200px] ">
           <Image

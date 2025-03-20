@@ -184,10 +184,7 @@ export async function POST(req: NextRequest) {
 
     // console.log("updatedBlogs is ", updatedBlogs);
 
-    return NextResponse.json(
-      { message: "Video processing started" },
-      { status: 201 }
-    );
+    return NextResponse.json({ video }, { status: 201 });
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);

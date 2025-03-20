@@ -1,5 +1,6 @@
 "use client";
 
+import { addUserVideo, useVideo } from "@/components/context/video";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -21,6 +22,7 @@ function CommandPaletteRepoForm() {
   const formRef = useRef<HTMLDivElement>(null);
   const actionQuery = searchParams.get("action");
   const router = useRouter();
+  const { dispatch } = useVideo();
 
   useEffect(() => {
     if (actionQuery === "convert") {
@@ -53,7 +55,7 @@ function CommandPaletteRepoForm() {
         setMessage(data.message || "Failed to process video");
       }
 
-      // dispatch(addUserRepository(repoDetailsData.repository));
+      dispatch(addUserVideo(data.video));
 
       setUrl("");
     } catch (error) {

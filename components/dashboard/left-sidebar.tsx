@@ -1,15 +1,16 @@
-import { Video } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { setUserVideos, useVideo } from "../context/video";
+import EmptyLeftSidebar from "./empty/left-sidebar";
 import SidebarRepoHeader from "./left-sidebar-repo-header";
 import VideoCardSkeleton from "./skeleton/video-card-skeleton";
 import VideoCard from "./video-card";
-import EmptyLeftSidebar from "./empty/left-sidebar";
 
 export function LeftSidebar() {
-  const [videos, setVideos] = useState<Video[]>();
   const [isFetchingVideos, setIsFetchingVideos] = useState<boolean>(true);
   const [message, setMessage] = useState<string | null>(null);
+  const { state, dispatch } = useVideo();
+  const videos = state.userVideos;
 
   useEffect(() => {
     async function fetchVideos() {
@@ -19,7 +20,7 @@ export function LeftSidebar() {
         if (!response.ok) {
           throw new Error(data.message);
         }
-        setVideos(data.videos);
+        dispatch(setUserVideos(data.videos));
       } catch (error) {
         if (error instanceof Error) {
           console.log("error.stack is ", error.stack);
@@ -54,7 +55,7 @@ export function LeftSidebar() {
           })}
         </div>
       ) : (
-        <EmptyLeftSidebar/>
+        <EmptyLeftSidebar />
       )}
     </div>
   );
