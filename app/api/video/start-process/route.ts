@@ -1,16 +1,19 @@
 import { authOptions } from "@/lib/auth-options";
-import {
-  generateBlogContent,
-  generateVideoOverview,
-  processBatchTranscriptSummariesAndTitle,
-} from "@/lib/gemini";
 import { prisma } from "@/lib/prisma";
-import { splitTranscript } from "@/lib/split-transcript";
+import { createServiceToken } from "@/lib/service-auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { YoutubeTranscript } from "youtube-transcript";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
+
+if (!YOUTUBE_API_KEY) {
+  throw new Error("YOUTUBE_API_KEY is required.");
+}
+
+if (!EXPRESS_API_URL) {
+  throw new Error("EXPRESS_API_URL is required.");
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,80 +92,97 @@ export async function POST(req: NextRequest) {
 
     console.log("video is ", video);
 
-    const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
-    const transcript = transcriptData.map((entry) => entry.text).join(" ");
-    const transcriptChunks = splitTranscript(transcript);
-    const createTranscript = transcriptChunks.map((chunk, index) => {
-      return prisma.blog.create({
-        data: {
-          transcript: chunk,
-          videoId: video.id,
-          part: index + 1,
-        },
-      });
+    const serviceToken = createServiceToken({
+      videoId: video.id,
+      userId: session.user.id,
     });
 
-    await prisma.$transaction(createTranscript);
-
-    await processBatchTranscriptSummariesAndTitle(video.id);
-
-    await generateVideoOverview(video.id);
-
-    const videoWithBlogs = await prisma.video.findUnique({
-      where: { id: video.id },
-      select: {
-        overview: true,
-        blogs: {
-          select: {
-            id: true,
-            summary: true,
-            transcript: true,
-          },
-        },
+    const response = await fetch(`${EXPRESS_API_URL}/api/queue/video`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceToken}`,
       },
     });
 
-    if (!videoWithBlogs || !videoWithBlogs.overview) {
-      return NextResponse.json(
-        { message: "Video or overview not found" },
-        { status: 404 }
-      );
-    }
+    const data = await response.json();
 
-    const overview = videoWithBlogs.overview;
-    const blogs = videoWithBlogs.blogs;
+    console.log("data --express api is ", data);
+
+    // const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
+    // const transcript = transcriptData.map((entry) => entry.text).join(" ");
+    // const transcriptChunks = splitTranscript(transcript);
+    // const createTranscript = transcriptChunks.map((chunk, index) => {
+    //   return prisma.blog.create({
+    //     data: {
+    //       transcript: chunk,
+    //       videoId: video.id,
+    //       part: index + 1,
+    //     },
+    //   });
+    // });
+
+    // await prisma.$transaction(createTranscript);
+
+    // await processBatchTranscriptSummariesAndTitle(video.id);
+
+    // await generateVideoOverview(video.id);
+
+    // const videoWithBlogs = await prisma.video.findUnique({
+    //   where: { id: video.id },
+    //   select: {
+    //     overview: true,
+    //     blogs: {
+    //       select: {
+    //         id: true,
+    //         summary: true,
+    //         transcript: true,
+    //       },
+    //     },
+    //   },
+    // });
+
+    // if (!videoWithBlogs || !videoWithBlogs.overview) {
+    //   return NextResponse.json(
+    //     { message: "Video or overview not found" },
+    //     { status: 404 }
+    //   );
+    // }
+
+    // const overview = videoWithBlogs.overview;
+    // const blogs = videoWithBlogs.blogs;
 
     // Create a combined string of all summaries for context
-    const allSummaries = blogs
-      .filter((blog) => blog.summary) // Only include blogs with summaries
-      .map((blog) => `${blog.summary}`)
-      .join("\n\n");
+    // const allSummaries = blogs
+    //   .filter((blog) => blog.summary)
+    //   .map((blog) => `${blog.summary}`)
+    //   .join("\n\n");
 
-    for (const blog of blogs) {
-      if (blog.transcript) {
-        const blogData = await generateBlogContent(
-          overview,
-          allSummaries,
-          blog.transcript
-        );
+    // for (const blog of blogs) {
+    //   if (blog.transcript) {
+    //     const blogData = await generateBlogContent(
+    //       overview,
+    //       allSummaries,
+    //       blog.transcript
+    //     );
 
-        // Update the blog with both title and content
-        await prisma.blog.update({
-          where: { id: blog.id },
-          data: {
-            content: blogData,
-          },
-        });
-      }
-    }
+    // Update the blog with both title and content
+    //     await prisma.blog.update({
+    //       where: { id: blog.id },
+    //       data: {
+    //         content: blogData,
+    //       },
+    //     });
+    //   }
+    // }
 
-    const updatedBlogs = await prisma.blog.findMany({
-      where: {
-        videoId: video.id,
-      },
-    });
+    // const updatedBlogs = await prisma.blog.findMany({
+    //   where: {
+    //     videoId: video.id,
+    //   },
+    // });
 
-    console.log("updatedBlogs is ", updatedBlogs);
+    // console.log("updatedBlogs is ", updatedBlogs);
 
     return NextResponse.json(
       { message: "Video processing started" },
