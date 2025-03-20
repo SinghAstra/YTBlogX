@@ -50,7 +50,7 @@ function Terminal({ logs, height = "400px" }: TerminalProps) {
   return (
     <div className="w-full bg-background">
       <div className="relative">
-        <div className="bg-card rounded-lg border border-border">
+        <div className="bg-card">
           <div
             className="rounded-md p-4 overflow-y-auto font-mono text-sm space-y-2 relative"
             ref={scrollRef}
