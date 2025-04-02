@@ -1,5 +1,3 @@
-"use client";
-
 import AnimationContainer from "@/components/global/animation-container";
 import MaxWidthWrapper from "@/components/global/max-width-wrapper";
 import { BackgroundShine } from "@/components/ui/background-shine";
@@ -7,32 +5,24 @@ import { BorderBeam } from "@/components/ui/border-beam";
 import GradientButton from "@/components/ui/gradient-button";
 import { LampContainer } from "@/components/ui/lamp";
 import { siteConfig } from "@/config/site";
+import { authOptions } from "@/lib/auth-options";
 import { ArrowRightIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
-const HomePage = () => {
-  const { data: user, status } = useSession();
-  const router = useRouter();
-  // const href = status === "authenticated" ? "/dashboard" : "/auth/sign-in";
+const HomePage = async () => {
+  const session = await getServerSession(authOptions);
 
   const handleGetStarted = () => {
-    if (status === "loading") {
-      toast("Checking your authentication status...");
-      return;
+    if (!session) {
+      redirect("/auth/sign-in");
     }
 
-    if (status === "unauthenticated") {
-      router.push("/auth/sign-in");
-      return;
-    }
-
-    if (status === "authenticated") {
-      router.push("/dashboard");
+    if (session) {
+      redirect("/dashboard");
     }
   };
   return (
@@ -62,7 +52,7 @@ const HomePage = () => {
             <div className="flex items-center justify-center gap-4 z-50">
               <BackgroundShine className="rounded-md">
                 <Link
-                  href={user ? "/dashboard" : "/auth/sign-in"}
+                  href={session ? "/dashboard" : "/auth/sign-in"}
                   className="flex items-center group"
                 >
                   Get started for free
@@ -131,13 +121,13 @@ const HomePage = () => {
             transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
             className="flex flex-col items-center justify-center gap-8  "
           >
-            <h1 className="mt-8 bg-muted-foreground py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
+            <h1 className="mt-8 py-4 text-center text-4xl font-medium tracking-tight text-foreground md:text-7xl">
               Youtube Videos to <br />
               Structured Knowledge
             </h1>
             <BackgroundShine>
               <Link
-                href={user ? "/dashboard" : "/auth/sign-in"}
+                href={session ? "/dashboard" : "/auth/sign-in"}
                 className="flex items-center "
               >
                 Get started for free
