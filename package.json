@@ -25,6 +25,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "devicon": "^2.16.0",
     "framer-motion": "^12.5.0",
     "he": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
