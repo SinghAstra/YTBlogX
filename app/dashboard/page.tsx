@@ -112,7 +112,7 @@ function CommandPaletteRepoForm() {
   }, [message]);
 
   return (
-    <div className="m-2 ">
+    <div className="m-2 w-full">
       {showGuide && (
         <div className="absolute inset-0 ">
           <div className="relative w-full h-full  flex items-center justify-center backdrop-blur-sm">
@@ -177,7 +177,7 @@ function CommandPaletteRepoForm() {
       )}
 
       <div
-        className={`rounded-xl border transition-all duration-600  ${
+        className={`rounded-xl border transition-all duration-600   ${
           showGuide ? "opacity-0" : "opacity-100"
         }`}
       >
