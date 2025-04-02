@@ -7,6 +7,7 @@ export const siteConfig: SiteConfig = {
   url: "https://ytblogx.vercel.app",
   links: {
     twitter: "https://x.com/XSinghAstra",
-    github: "https://github.com/SinghAstra/YTBlogX",
+    github: "https://github.com/SinghAstra",
+    githubRepo: "https://github.com/SinghAstra/YTBlogX",
   },
 };

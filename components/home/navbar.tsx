@@ -1,41 +1,22 @@
-"use client";
-
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { User } from "next-auth";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import AnimationContainer from "../global/animation-container";
 import MaxWidthWrapper from "../global/max-width-wrapper";
 import { AvatarMenu } from "../ui/avatar-menu";
-import SignInButton from "../ui/sign-in";
-import { Skeleton } from "../ui/skeleton";
+import SignIn from "../ui/sign-in";
 
-const Navbar = () => {
-  const { data: session, status } = useSession();
+interface NavbarProps {
+  user: User | undefined;
+}
 
-  const [scroll, setScroll] = useState(false);
-
-  const handleScroll = () => {
-    if (window.scrollY > 8) {
-      setScroll(true);
-    } else {
-      setScroll(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
+const Navbar = ({ user }: NavbarProps) => {
   return (
     <header
       className={cn(
-        "fixed top-0 inset-x-0 h-14 z-[99999] border-b border-transparent backdrop-blur-lg",
-        scroll && "border-background/80 bg-background/40 "
+        "fixed top-0 inset-x-0 h-14 z-[99] border-b border-dashed backdrop-blur-lg"
       )}
     >
       <AnimationContainer reverse delay={0.2} className="size-full">
@@ -49,13 +30,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center">
-            {status === "loading" ? (
-              <Skeleton className="h-10 w-10 rounded-full  border-primary border-2" />
-            ) : session?.user ? (
-              <AvatarMenu />
-            ) : (
-              <SignInButton />
-            )}
+            {user ? <AvatarMenu user={user} /> : <SignIn />}
           </div>
         </MaxWidthWrapper>
       </AnimationContainer>

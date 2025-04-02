@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: "/api/og",
+        url: "/assets/landing.png",
         width: 1200,
         height: 630,
       },
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    images: ["/api/og"],
+    images: ["/assets/landing.png"],
     creator: "@singhastra",
   },
   icons: {
@@ -64,7 +64,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-background">
+      <body className="antialiased min-h-screen ">
         <Providers>
           <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
           {children}
