@@ -1,11 +1,12 @@
-import MDXSource from "@/components/mdx/mdx-source";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { authOptions } from "@/lib/auth-options";
+import { parseMdx } from "@/lib/markdown";
+import { prisma } from "@/lib/prisma";
 import { ArrowLeft, Clock } from "lucide-react";
-import { serialize } from "next-mdx-remote/serialize";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 function calculateReadingTime(
   text: string,
@@ -24,27 +25,59 @@ function calculateReadingTime(
   return Math.max(1, Math.round(readingTime));
 }
 
-async function getBlog(id: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/blog/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
-    const data = await response.json();
+export async function generateMetadata({
+  params,
+}: {
+  params: { videoId: string; blogId: string };
+}) {
+  const session = await getServerSession(authOptions);
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch blog data");
+  if (!session) {
+    return {
+      title: "Sign In Required",
+    };
+  }
+
+  try {
+    const blog = await prisma.blog.findUnique({
+      where: {
+        id: params.blogId,
+      },
+      include: {
+        video: true,
+      },
+    });
+
+    if (!blog) {
+      return {
+        title: "Blog Not Found",
+      };
     }
 
-    return data;
+    const blogTitle =
+      blog.title || `Part ${blog.part} of "${blog.video.title}"`;
+    const blogDescription =
+      blog.summary || `Notes for part ${blog.part} of "${blog.video.title}"`;
+
+    return {
+      title: `${blogTitle} | Video Notes`,
+      description: blogDescription,
+      openGraph: {
+        title: blogTitle,
+        description: blogDescription,
+        images: [{ url: blog.video.videoThumbnail }],
+        type: "article",
+        authors: [blog.video.channelName || "Unknown"],
+      },
+    };
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
       console.log("error.message is ", error.message);
     }
-    return null;
+    return {
+      title: "Error Loading Blog",
+    };
   }
 }
 
@@ -53,15 +86,27 @@ export default async function BlogPage({
 }: {
   params: { videoId: string; blogId: string };
 }) {
-  const blog = await getBlog(params.blogId);
-  console.log("blog.content is ", blog.content);
-  const mdxSource = await serialize(blog.content);
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
+  const blog = await prisma.blog.findUnique({
+    where: {
+      id: params.blogId,
+    },
+    include: {
+      video: true,
+    },
+  });
 
   if (!blog) {
     notFound();
   }
+  const { content } = await parseMdx(blog.content ?? "No Content Found");
 
-  const readingTime = calculateReadingTime(blog.content);
+  const readingTime = calculateReadingTime(blog.content ?? "No Content Found");
 
   return (
     <div className="flex flex-col  min-h-screen bg-background">
@@ -82,7 +127,7 @@ export default async function BlogPage({
       <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 max-w-5xl mx-auto">
         <article className="space-y-8">
           {/* Video thumbnail with part overlay */}
-          <div className="relative rounded-xl overflow-hidden w-full aspect-video">
+          <div className="relative rounded overflow-hidden w-full aspect-video">
             <Image
               src={
                 blog.video.videoThumbnail ||
@@ -95,11 +140,11 @@ export default async function BlogPage({
             />
             <div className="absolute inset-0 bg-black/50"></div>
             <div className="absolute inset-0  flex items-center justify-center">
-              <div className="text-center">
-                <span className="text-2xl font-normal bg-muted/80 px-4 py-1 rounded">
+              <div className="text-center flex flex-col gap-1 py-2 max-w-[80%] bg-muted/80 rounded">
+                <span className="text-3xl font-normal  px-4 py-1">
                   Part {blog.part}
                 </span>
-                <h1 className="text-2xl font-normal bg-muted/80 px-4 py-1 rounded md:text-3xl ">
+                <h1 className="text-2xl font-normal px-4 py-1 md:text-3xl ">
                   {blog.title || blog.video.title}
                 </h1>
               </div>
@@ -128,16 +173,7 @@ export default async function BlogPage({
             </div>
           </div>
 
-          {/* Blog content */}
-          <Card className="p-6 md:p-8 prose prose-slate dark:prose-invert max-w-none">
-            {blog.content ? (
-              <MDXSource mdxSource={mdxSource} />
-            ) : (
-              <div className="text-muted-foreground italic">
-                This blog has no content
-              </div>
-            )}
-          </Card>
+          {content}
         </article>
       </main>
     </div>

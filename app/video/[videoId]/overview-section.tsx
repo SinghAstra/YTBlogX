@@ -10,7 +10,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
 const OverviewSection = ({ overview }: { overview: string | null }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   if (!overview) {
     return null;

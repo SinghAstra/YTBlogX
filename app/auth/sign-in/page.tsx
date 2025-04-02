@@ -126,7 +126,7 @@ export default function SignIn() {
           <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
           <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-purple-500/20 blur-3xl" />
 
-          <div className="w-full max-w-md p-8 bg-card/50 backdrop-blur-sm rounded-md border space-y-6">
+          <div className="w-[400px] p-8 bg-card/50 backdrop-blur-sm rounded-md border space-y-6">
             <div className="space-y-2 text-center">
               <MagicBadge title={`Welcome to ${siteConfig.name}`} />
             </div>
@@ -135,8 +135,8 @@ export default function SignIn() {
               <Button
                 onClick={handleGitHubSignIn}
                 disabled={isGithubLoading}
-                variant="default"
-                className="w-full bg-[#24292F] text-white hover:bg-[#24292F]/90 group"
+                variant="outline"
+                className="w-full text-primary"
               >
                 {isGithubLoading ? (
                   <>
@@ -147,9 +147,6 @@ export default function SignIn() {
                   <>
                     <FaGithub className="mr-2 h-5 w-5" />
                     <span className="text-center">Continue with GitHub</span>
-                    <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full ml-2 animate-pulse">
-                      Recommended
-                    </span>
                   </>
                 )}
               </Button>

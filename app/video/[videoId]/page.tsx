@@ -1,34 +1,66 @@
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { convertISO8601ToTime } from "@/components/dashboard/video-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/prisma";
 import { Blog } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import OverviewSection from "./overview-section";
 
-async function getVideo(id: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/video/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
-    const data = await response.json();
+export async function generateMetadata({
+  params,
+}: {
+  params: { videoId: string };
+}) {
+  const session = await getServerSession(authOptions);
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch video");
+  if (!session) {
+    return {
+      title: "Sign In Required",
+      description: "Please sign in to view this content",
+    };
+  }
+
+  try {
+    const video = await prisma.video.findUnique({
+      where: { id: params.videoId, userId: session.user.id },
+    });
+
+    if (!video) {
+      return {
+        title: "Video Not Found",
+        description: "The requested video could not be found",
+      };
     }
 
-    return data;
+    return {
+      title: `${video.title} | Video Notes`,
+      description: video.overview || `Video notes for ${video.title}`,
+      openGraph: {
+        title: video.title,
+        description: video.overview || `Video notes for ${video.title}`,
+        images: [{ url: video.videoThumbnail }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: video.title,
+        description: video.overview || `Video notes for ${video.title}`,
+        images: [video.videoThumbnail],
+      },
+    };
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
       console.log("error.message is ", error.message);
     }
-    return null;
+    return {
+      title: "Error Loading Video",
+      description: "There was an error loading the video information",
+    };
   }
 }
 
@@ -37,7 +69,22 @@ export default async function VideoPage({
 }: {
   params: { videoId: string };
 }) {
-  const video = await getVideo(params.videoId);
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
+  const video = await prisma.video.findUnique({
+    where: { id: params.videoId, userId: session.user.id },
+    include: {
+      blogs: {
+        orderBy: {
+          part: "asc",
+        },
+      },
+    },
+  });
 
   if (!video) {
     notFound();
