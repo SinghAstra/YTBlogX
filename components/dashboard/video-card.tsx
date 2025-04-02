@@ -49,11 +49,12 @@ const VideoCard = ({ video }: VideoCardProps) => {
       }
     >
       <div className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200">
-        <div className="relative w-full h-[200px] ">
+        <div className="relative w-full h-[200px] rounded-sm overflow-hidden">
           <Image
             src={video.videoThumbnail}
             alt={video.title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="rounded-sm object-cover "
           />
           {video.processingState !== "COMPLETED" && (

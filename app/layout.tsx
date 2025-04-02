@@ -68,7 +68,19 @@ export default function RootLayout({
         <Providers>
           <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
           {children}
-          <Toaster />
+          <Toaster
+            theme="dark"
+            toastOptions={{
+              style: {
+                fontFamily: "Space Grotesk, monospace",
+                background: "hsl(var(--muted) / 0.2)",
+                color: "hsl(var(--foreground))",
+                border: "1px solid hsl(var(--border))",
+                letterSpacing: "0.01em",
+                fontSize: ".95rem",
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>

@@ -13,7 +13,7 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-dotted bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="fixed top-0 z-50 w-full border-b border-dashed  backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4">
         <Link href="/dashboard">
           <span className="text-xl tracking-wider">{siteConfig.name}</span>
