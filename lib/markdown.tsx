@@ -175,6 +175,28 @@ export async function parseMdx(rawMdx: string) {
   };
 }
 
+export async function getToc(content: string) {
+  const headingsRegex = /^(#{2,4})\s(.+)$/gm;
+  let match;
+  const extractedHeadings = [];
+  while ((match = headingsRegex.exec(content)) !== null) {
+    const headingLevel = match[1].length;
+    const headingText = match[2].trim();
+    const slug = getSlug(headingText);
+    extractedHeadings.push({
+      level: headingLevel,
+      text: headingText,
+      href: `#${slug}`,
+    });
+  }
+  return extractedHeadings;
+}
+
+function getSlug(text: string) {
+  const slug = text.toLowerCase().replace(/\s+/g, "-");
+  return slug.replace(/[^a-z0-9-]/g, "");
+}
+
 // for copying the code in pre
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const preProcess = () => (tree: any) => {

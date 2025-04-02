@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth-options";
 import { parseMdx } from "@/lib/markdown";
 import { prisma } from "@/lib/prisma";
-import { ArrowLeft, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import Toc from "./toc";
 
 function calculateReadingTime(
   text: string,
@@ -110,21 +109,9 @@ export default async function BlogPage({
 
   return (
     <div className="flex flex-col  min-h-screen bg-background">
-      <aside className="md:fixed md:top-18 ">
-        <div className="p-4 space-y-4">
-          <Link href={`/video/${params.videoId}`}>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 w-full justify-start"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>All Blogs</span>
-            </Button>
-          </Link>
-        </div>
-      </aside>
+      {blog.content && <Toc content={blog.content} videoId={params.videoId} />}
 
-      <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 max-w-5xl mx-auto">
+      <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 mx-auto xl:ml-[20rem]">
         <article className="space-y-8">
           {/* Video thumbnail with part overlay */}
           <div className="relative rounded overflow-hidden w-full aspect-video">
