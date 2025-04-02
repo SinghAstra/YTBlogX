@@ -1,6 +1,6 @@
 import React from "react";
 import { useVideo } from "../context/video";
-import EmptyLeftSidebar from "./empty/left-sidebar";
+import EmptyLeftSidebar from "./empty-left-sidebar";
 import VideoCard from "./video-card";
 
 const SidebarRepoList = () => {
