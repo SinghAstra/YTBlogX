@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/config/site";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
@@ -12,7 +11,6 @@ import { useState } from "react";
 import AnimationContainer from "@/components/global/animation-container";
 import MagicBadge from "@/components/ui/magic-badge";
 import { Clock, History, Loader } from "lucide-react";
-import { FaGithub } from "react-icons/fa";
 
 const features = [
   {
@@ -37,29 +35,10 @@ const features = [
 
 export default function SignIn() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGithubLoading, setIsGithubLoading] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   console.log("callbackUrl is ", callbackUrl);
-
-  const handleGitHubSignIn = async () => {
-    try {
-      setIsGithubLoading(true);
-      await signIn("github", {
-        callbackUrl,
-        redirect: true,
-      });
-    } catch (error) {
-      console.log("Error occurred during github sign in");
-      if (error instanceof Error) {
-        console.log("error.stack is ", error.stack);
-        console.log("error.message is ", error.message);
-      }
-    } finally {
-      setIsGithubLoading(false);
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -75,7 +54,7 @@ export default function SignIn() {
         console.log("error.message is ", error.message);
       }
     } finally {
-      setIsGithubLoading(false);
+      setIsGoogleLoading(false);
     }
   };
 
@@ -131,62 +110,30 @@ export default function SignIn() {
               <MagicBadge title={`Welcome to ${siteConfig.name}`} />
             </div>
 
-            <div className="space-y-4">
-              <Button
-                onClick={handleGitHubSignIn}
-                disabled={isGithubLoading}
-                variant="outline"
-                className="w-full text-primary"
-              >
-                {isGithubLoading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Wait ...
-                  </>
-                ) : (
-                  <>
-                    <FaGithub className="mr-2 h-5 w-5" />
-                    <span className="text-center">Continue with GitHub</span>
-                  </>
-                )}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase ">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or
-                  </span>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-full text-primary"
-                onClick={handleGoogleSignIn}
-                disabled={isGoogleLoading}
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Wait ...
-                  </>
-                ) : (
-                  <>
-                    <Image
-                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                      alt="Google"
-                      width={18}
-                      height={18}
-                      className="mr-2"
-                    />
-                    Continue with Google
-                  </>
-                )}
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              className="w-full text-primary"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading}
+            >
+              {isGoogleLoading ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin" />
+                  Wait ...
+                </>
+              ) : (
+                <>
+                  <Image
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google"
+                    width={18}
+                    height={18}
+                    className="mr-2"
+                  />
+                  Continue with Google
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
