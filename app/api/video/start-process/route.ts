@@ -76,6 +76,9 @@ export async function POST(req: NextRequest) {
 
     const channelThumbnail = channelData.snippet.thumbnails.high.url;
 
+    console.log("About to created Video");
+    console.log("session.user.id is ", session.user.id);
+
     // Save new video to DB
     const video = await prisma.video.create({
       data: {
@@ -108,81 +111,6 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
 
     console.log("data --express api is ", data);
-
-    // const transcriptData = await YoutubeTranscript.fetchTranscript(youtubeId);
-    // const transcript = transcriptData.map((entry) => entry.text).join(" ");
-    // const transcriptChunks = splitTranscript(transcript);
-    // const createTranscript = transcriptChunks.map((chunk, index) => {
-    //   return prisma.blog.create({
-    //     data: {
-    //       transcript: chunk,
-    //       videoId: video.id,
-    //       part: index + 1,
-    //     },
-    //   });
-    // });
-
-    // await prisma.$transaction(createTranscript);
-
-    // await processBatchTranscriptSummariesAndTitle(video.id);
-
-    // await generateVideoOverview(video.id);
-
-    // const videoWithBlogs = await prisma.video.findUnique({
-    //   where: { id: video.id },
-    //   select: {
-    //     overview: true,
-    //     blogs: {
-    //       select: {
-    //         id: true,
-    //         summary: true,
-    //         transcript: true,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // if (!videoWithBlogs || !videoWithBlogs.overview) {
-    //   return NextResponse.json(
-    //     { message: "Video or overview not found" },
-    //     { status: 404 }
-    //   );
-    // }
-
-    // const overview = videoWithBlogs.overview;
-    // const blogs = videoWithBlogs.blogs;
-
-    // Create a combined string of all summaries for context
-    // const allSummaries = blogs
-    //   .filter((blog) => blog.summary)
-    //   .map((blog) => `${blog.summary}`)
-    //   .join("\n\n");
-
-    // for (const blog of blogs) {
-    //   if (blog.transcript) {
-    //     const blogData = await generateBlogContent(
-    //       overview,
-    //       allSummaries,
-    //       blog.transcript
-    //     );
-
-    // Update the blog with both title and content
-    //     await prisma.blog.update({
-    //       where: { id: blog.id },
-    //       data: {
-    //         content: blogData,
-    //       },
-    //     });
-    //   }
-    // }
-
-    // const updatedBlogs = await prisma.blog.findMany({
-    //   where: {
-    //     videoId: video.id,
-    //   },
-    // });
-
-    // console.log("updatedBlogs is ", updatedBlogs);
 
     return NextResponse.json({ video }, { status: 201 });
   } catch (error) {

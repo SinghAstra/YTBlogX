@@ -11,13 +11,13 @@ interface LeftSidebarProps {
 }
 
 export function LeftSidebar({ videos }: LeftSidebarProps) {
-  const { dispatch } = useVideo();
+  const { state, dispatch } = useVideo();
 
   useEffect(() => {
-    if (videos) {
+    if (videos && state.userVideos.length === 0) {
       dispatch(setUserVideos(videos));
     }
-  }, [dispatch, videos]);
+  }, [dispatch, videos, state.userVideos.length]);
 
   return (
     <div className="w-full md:fixed md:inset-y-0 md:left-0 md:w-96 bg-background md:border-r md:border-dashed md:pt-16">

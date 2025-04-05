@@ -58,6 +58,8 @@ function CommandPaletteRepoForm() {
       dispatch(addUserVideo(data.video));
 
       setUrl("");
+      dismissGuide();
+      setMessage("Video Processing Started");
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);

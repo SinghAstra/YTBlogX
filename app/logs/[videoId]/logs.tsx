@@ -43,7 +43,7 @@ const RepoProcessingLogs = ({ video }: RepoProcessingLogsProps) => {
 
   return (
     <MaxWidthWrapper>
-      <div className="flex border p-2 rounded-md">
+      <div className="flex border py-2 pl-2 rounded-md">
         <div className="max-w-lg w-full ">
           <div className="relative w-full h-[400px] ">
             <Image
