@@ -59,3 +59,22 @@ export function parseYoutubeUrl(url: string): {
 
   return { isValid: true };
 }
+
+export function convertISO8601ToTime(duration: string) {
+  const hoursMatch = duration.match(/(\d+)H/);
+  const minutesMatch = duration.match(/(\d+)M/);
+  const secondsMatch = duration.match(/(\d+)S/);
+
+  const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+  const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+  const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+
+  // Format as "H:MM:SS" or "MM:SS" if no hours
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+}

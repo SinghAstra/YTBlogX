@@ -3,10 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { convertISO8601ToTime } from "@/components/dashboard/video-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { convertISO8601ToTime } from "@/lib/utils";
 import { Blog } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import OverviewSection from "./overview-section";
