@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { getToc } from "@/lib/markdown";
+import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import TocObserver from "./toc-observer";
@@ -14,21 +15,22 @@ export default async function Toc({
   const toc = await getToc(content);
 
   return (
-    <div className="xl:flex hidden w-[20rem] py-2 fixed inset-y-0 left-0 top-16  border-r border-dashed px-3  flex-col gap-8 ">
-      <Link href={`/video/${videoId}`}>
-        <Button
-          variant="outline"
-          className="flex items-center gap-2 w-full justify-start"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>All Blogs</span>
-        </Button>
-      </Link>
-      <div className="flex flex-col gap-3 w-full pl-2">
-        <h3 className="font-medium text-sm">On this page</h3>
-        <div className="pb-2 pt-0.5 overflow-y-auto">
-          <TocObserver data={toc} />
+    <div className="xl:flex hidden w-[20rem]  fixed inset-y-0 left-0 top-16  border-r border-dashed   flex-col gap-2 ">
+      <div className="pb-2 h-full overflow-y-auto">
+        <div className="sticky top-0 inset-x-0  flex flex-col gap-1 pl-2 backdrop-blur-md py-2 mb-4">
+          <Link href={`/video/${videoId}`}>
+            <div
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "flex items-center gap-2  justify-start bg-transparent"
+              )}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>All Blogs</span>
+            </div>
+          </Link>
         </div>
+        <TocObserver data={toc} />
       </div>
     </div>
   );
