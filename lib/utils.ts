@@ -41,3 +41,21 @@ export function getIconName(name: string) {
   const ext = splittedNames[splittedNames.length - 1];
   return fileExtensionIconMap[ext as keyof typeof fileExtensionIconMap];
 }
+
+export function parseYoutubeUrl(url: string): {
+  isValid: boolean;
+  message?: string;
+} {
+  const regex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}(&\S*)?$/;
+
+  if (!url.trim()) {
+    return { isValid: false, message: "URL cannot be empty." };
+  }
+
+  if (!regex.test(url)) {
+    return { isValid: false, message: "Invalid YouTube video URL." };
+  }
+
+  return { isValid: true };
+}

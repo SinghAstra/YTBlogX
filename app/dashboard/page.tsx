@@ -2,7 +2,7 @@
 
 import { addUserVideo, useVideo } from "@/components/context/video";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, parseYoutubeUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { SearchIcon, SparklesIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -11,9 +11,7 @@ import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 
 function CommandPaletteRepoForm() {
-  const [url, setUrl] = useState(
-    "https://www.youtube.com/watch?v=KzH1ovd4Ots&list=PLoROMvodv4rNH7qL6-efu_q2_bPuy0adh&index=1&t=3620s"
-  );
+  const [url, setUrl] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -32,12 +30,12 @@ function CommandPaletteRepoForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const validation = parseGithubUrl(url);
+    const validation = parseYoutubeUrl(url);
 
-    // if (!validation.isValid) {
-    //   setMessage(validation.error ? validation.error : null);
-    //   return;
-    // }
+    if (!validation.isValid) {
+      setMessage(validation.message ? validation.message : null);
+      return;
+    }
 
     setIsProcessing(true);
 
@@ -135,7 +133,7 @@ function CommandPaletteRepoForm() {
                 <div className="flex items-center border-b px-4 py-3 gap-2">
                   <SearchIcon className="w-5 h-5 text-muted-foreground mr-2" />
                   <input
-                    type="url"
+                    type="text"
                     placeholder="Paste Your Youtube Video URL..."
                     value={url}
                     onChange={(e) => {
@@ -187,7 +185,7 @@ function CommandPaletteRepoForm() {
           <div className="flex items-center border-b px-4 py-3 gap-2">
             <SearchIcon className="w-5 h-5 text-muted-foreground mr-2" />
             <input
-              type="url"
+              type="text"
               placeholder="Paste Your Youtube Video URL..."
               value={url}
               onChange={(e) => {
