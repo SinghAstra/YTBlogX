@@ -5,6 +5,7 @@ import { Clock } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
+import BlogNavigation from "./blog-navigation";
 import Toc from "./toc";
 
 function calculateReadingTime(
@@ -161,6 +162,7 @@ export default async function BlogPage({
           </div>
 
           {content}
+          <BlogNavigation part={blog.part} videoId={params.videoId} />
         </article>
       </main>
     </div>
