@@ -4,7 +4,7 @@ import { convertISO8601ToTime } from "@/lib/utils";
 import { Video, VideoProcessingState } from "@prisma/client";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -24,8 +24,7 @@ const getStatusColor = (status: VideoProcessingState) => {
   return "border-yellow-500 text-yellow-500";
 };
 
-const VideoCard = ({ video }: VideoCardProps) => {
-  const router = useRouter();
+const SidebarVideoCard = ({ video }: VideoCardProps) => {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,26 +33,38 @@ const VideoCard = ({ video }: VideoCardProps) => {
     setMessage(null);
   }, [message]);
 
-  const handleVideoCardClick = () => {
+  const getHref = () => {
     if (video.processingState === VideoProcessingState.COMPLETED) {
-      router.push(`/video/${video.id}`);
+      return `/video/${video.id}`;
     }
-    if (video.processingState === VideoProcessingState.FAILED) {
-      setMessage("Video Processing Failed. Please try again");
-    }
+
     if (
       video.processingState === VideoProcessingState.PENDING ||
       video.processingState === VideoProcessingState.PROCESSING
     ) {
-      router.push(`/logs/${video.id}`);
+      return `/logs/${video.id}`;
     }
+    return null;
   };
 
-  return (
+  const href = getHref();
+
+  return href ? (
+    <Link href={href}>
+      <VideoCard video={video} />
+    </Link>
+  ) : (
     <div
-      className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200 cursor-pointer"
-      onClick={handleVideoCardClick}
+      onClick={() => setMessage("Video Processing Failed! Please Try again")}
     >
+      <VideoCard video={video} />
+    </div>
+  );
+};
+
+const VideoCard = ({ video }: VideoCardProps) => {
+  return (
+    <div className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200 cursor-pointer">
       <div className="relative w-full h-[200px] rounded-sm overflow-hidden">
         <Image
           src={video.videoThumbnail}
@@ -100,4 +111,4 @@ const VideoCard = ({ video }: VideoCardProps) => {
   );
 };
 
-export default VideoCard;
+export default SidebarVideoCard;
