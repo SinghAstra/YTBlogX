@@ -1,6 +1,7 @@
 "use client";
 
-import AnimationContainer from "@/components/global/animation-container";
+import FadeIn from "@/components/global/fade-in";
+import FadeSlideIn from "@/components/global/fade-slide-in";
 import MaxWidthWrapper from "@/components/global/max-width-wrapper";
 import { BackgroundShine } from "@/components/ui/background-shine";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -34,9 +35,9 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
       {/* Hero Section */}
       <MaxWidthWrapper>
         <div className="flex flex-col items-center justify-center w-full ">
-          <AnimationContainer
+          <FadeIn
             className="flex flex-col items-center justify-center w-full text-center"
-            delay={0.2}
+            delay={0.1}
           >
             <GradientButton onClick={handleGetStarted}>
               ✨ Start Learning
@@ -76,10 +77,10 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
                 </a>
               </GradientButton>
             </div>
-          </AnimationContainer>
+          </FadeIn>
 
-          <AnimationContainer
-            delay={0.5}
+          <FadeSlideIn
+            delay={0.3}
             className="relative pt-20 pb-20 md:py-32 px-2 bg-transparent w-full"
           >
             <div className="absolute md:top-[10%] left-1/2 gradient w-3/4 -translate-x-1/2 h-1/4 md:h-1/3 inset-0 blur-[5rem] animate-image-glow"></div>
@@ -96,25 +97,9 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
               <div className="absolute -bottom-4 inset-x-0 w-full h-1/2 bg-gradient-to-t from-background z-40"></div>
               <div className="absolute bottom-0 md:-bottom-8 inset-x-0 w-full h-1/4 bg-gradient-to-t from-background z-50"></div>
             </div>
-          </AnimationContainer>
+          </FadeSlideIn>
         </div>
       </MaxWidthWrapper>
-
-      {/* Features Section */}
-      {/* <MaxWidthWrapper className="pt-10">
-    <AnimationContainer delay={0.1}>
-      <div className="flex flex-col w-full items-center lg:items-center justify-center py-8">
-        <MagicBadge title="Process" />
-      </div>
-    </AnimationContainer>
-    <AnimationContainer delay={0.2}>
-      <BentoGrid className="py-8 ">
-        {Steps(href).map((step, idx) => (
-          <BentoCard key={idx} {...step} />
-        ))}
-      </BentoGrid>
-    </AnimationContainer>
-  </MaxWidthWrapper> */}
 
       {/* CTA Section */}
       <MaxWidthWrapper className="mt-20 max-w-[100vw] overflow-x-hidden scrollbar-hide">
