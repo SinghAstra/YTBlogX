@@ -112,7 +112,7 @@ export default async function BlogPage({
     <div className="flex flex-col  min-h-screen bg-background">
       {blog.content && <Toc content={blog.content} videoId={params.videoId} />}
 
-      <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 mx-auto xl:ml-[20rem]">
+      <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 mx-auto xl:ml-[20rem] xl:w-[calc(100%-20rem)] ">
         <article className="space-y-8">
           {/* Video thumbnail with part overlay */}
           <div className="relative rounded overflow-hidden w-full aspect-video">

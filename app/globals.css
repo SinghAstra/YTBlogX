@@ -140,7 +140,8 @@ input:-webkit-autofill:not(:focus) {
 
 pre > code {
   display: grid;
-  max-width: inherit !important;
+  width: 100%;
+  white-space: pre;
   padding: 10px 14px !important;
 }
 
