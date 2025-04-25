@@ -92,8 +92,12 @@ export default async function VideoPage({
 
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto lg:border-dotted lg:border-r">
-        <div className="space-y-4">
+      <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto lg:border-dotted lg:border-r space-y-2">
+        <Link
+          href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+          className="hover:bg-muted/50 transition-all duration-200 rounded-md p-2 flex flex-col gap-4"
+          target="_blank"
+        >
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
             <Image
               src={video.videoThumbnail}
@@ -111,7 +115,7 @@ export default async function VideoPage({
           <h1 className="text-md font-normal leading-tight">{video.title}</h1>
 
           {/* Channel info */}
-          <div className="flex items-center gap-2 border-b border-dotted pb-2">
+          <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
               <AvatarImage
                 src={video.channelThumbnail}
@@ -123,10 +127,10 @@ export default async function VideoPage({
             </Avatar>
             <span className="font-medium">{video.channelName}</span>
           </div>
+        </Link>
 
-          {/* Video overview */}
-          <OverviewSection overview={video.overview} />
-        </div>
+        {/* Video overview */}
+        <OverviewSection overview={video.overview} />
       </div>
 
       {/* Right side - Blog segments */}
