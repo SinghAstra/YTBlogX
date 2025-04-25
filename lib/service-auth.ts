@@ -1,14 +1,25 @@
 import jwt from "jsonwebtoken";
 
-const SERVICE_JWT_SECRET = process.env.SERVICE_JWT_SECRET;
-
 export function createServiceToken(payload: {
-  videoId: string;
+  repositoryId: string;
   userId: string;
+  githubUrl: string;
 }) {
-  if (!SERVICE_JWT_SECRET) {
+  const secret = process.env.SERVICE_JWT_SECRET;
+
+  if (!secret) {
     throw new Error("ENV SERVICE_JWT_SECRET is required.");
   }
 
-  return jwt.sign(payload, SERVICE_JWT_SECRET, { expiresIn: "15m" });
+  return jwt.sign(payload, secret, { expiresIn: "15m" });
+}
+
+export function createCleanJobsToken(payload: { userId: string }) {
+  const secret = process.env.SERVICE_JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("ENV SERVICE_JWT_SECRET is required.");
+  }
+
+  return jwt.sign(payload, secret, { expiresIn: "15m" });
 }

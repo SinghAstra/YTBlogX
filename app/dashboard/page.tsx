@@ -1,14 +1,25 @@
 "use client";
 
 import { addUserVideo, useVideo } from "@/components/context/video";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { cn, parseYoutubeUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { SearchIcon, SparklesIcon } from "lucide-react";
+import { AlertCircle, SearchIcon, SparklesIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
+import { fetchProcessingVideos, stopVideoProcessing } from "./action";
 
 function CommandPaletteRepoForm() {
   const [url, setUrl] = useState<string>("");
@@ -20,6 +31,7 @@ function CommandPaletteRepoForm() {
   const formRef = useRef<HTMLDivElement>(null);
   const actionQuery = searchParams.get("action");
   const router = useRouter();
+  const [showAlert, setShowAlert] = useState(false);
   const { dispatch } = useVideo();
 
   useEffect(() => {
@@ -30,15 +42,29 @@ function CommandPaletteRepoForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
     const validation = parseYoutubeUrl(url);
 
     if (!validation.isValid) {
-      setMessage(validation.message ? validation.message : null);
+      setMessage(
+        validation.message ? validation.message : "Invalid Youtube URL"
+      );
       return;
     }
 
-    setIsProcessing(true);
+    const pendingVideos = await fetchProcessingVideos();
 
+    if (pendingVideos.length > 0) {
+      setIsProcessing(false);
+      setShowAlert(true);
+      return;
+    }
+
+    processRepository();
+  };
+
+  const processRepository = async () => {
+    setIsProcessing(true);
     try {
       const response = await fetch("/api/video/start-process", {
         method: "POST",
@@ -67,6 +93,17 @@ function CommandPaletteRepoForm() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleContinueWithNewVideo = async () => {
+    setIsProcessing(true);
+    setShowAlert(false);
+    await stopVideoProcessing();
+    processRepository();
+  };
+
+  const handleCancelNewVideo = () => {
+    setShowAlert(false);
   };
 
   useEffect(() => {
@@ -113,6 +150,36 @@ function CommandPaletteRepoForm() {
 
   return (
     <div className="m-2 w-full">
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-yellow-500 mr-2" />
+              Pending Video Processing
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              You have video processing already in progress. Due to API
+              restrictions, starting a new video processing will stop the
+              processing of all other videos. Do you want to continue with the
+              new video blog generation?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={handleCancelNewVideo}
+              className="w-full"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleContinueWithNewVideo}
+              className="w-full"
+            >
+              Continue with new Video
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {showGuide && (
         <div className="absolute inset-0 ">
           <div className="relative w-full h-full  flex items-center justify-center backdrop-blur-sm">
