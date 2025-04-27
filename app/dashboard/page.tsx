@@ -16,7 +16,7 @@ import { cn, parseYoutubeUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AlertCircle, SearchIcon, SparklesIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 import { fetchProcessingVideos, stopVideoProcessing } from "./action";
@@ -40,7 +40,7 @@ function CommandPaletteRepoForm() {
     }
   }, [actionQuery]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
     const validation = parseYoutubeUrl(url);
@@ -49,6 +49,7 @@ function CommandPaletteRepoForm() {
       setMessage(
         validation.message ? validation.message : "Invalid Youtube URL"
       );
+      setIsProcessing(false);
       return;
     }
 
@@ -60,10 +61,10 @@ function CommandPaletteRepoForm() {
       return;
     }
 
-    processRepository();
+    processVideos();
   };
 
-  const processRepository = async () => {
+  const processVideos = async () => {
     setIsProcessing(true);
     try {
       const response = await fetch("/api/video/start-process", {
@@ -99,7 +100,7 @@ function CommandPaletteRepoForm() {
     setIsProcessing(true);
     setShowAlert(false);
     await stopVideoProcessing();
-    processRepository();
+    processVideos();
   };
 
   const handleCancelNewVideo = () => {
