@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         videoThumbnail,
         channelThumbnail,
         duration,
-        processingState: "PENDING",
+        status: "PENDING",
       },
     });
 

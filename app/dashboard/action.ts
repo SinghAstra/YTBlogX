@@ -52,7 +52,7 @@ export async function fetchProcessingVideos() {
   try {
     const response = await prisma.video.findMany({
       where: {
-        processingState: {
+        status: {
           in: ["PENDING", "PROCESSING"],
         },
       },
@@ -80,12 +80,12 @@ export async function stopVideoProcessing() {
     await prisma.video.updateMany({
       where: {
         userId: session.user.id,
-        processingState: {
+        status: {
           in: ["PENDING", "PROCESSING"],
         },
       },
       data: {
-        processingState: "FAILED",
+        status: "FAILED",
       },
     });
 

@@ -3,33 +3,36 @@
 import MaxWidthWrapper from "@/components/global/max-width-wrapper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Terminal from "@/components/ui/terminal";
-import { ProcessingUpdate } from "@/interfaces/processing";
 import pusherClient from "@/lib/pusher/client";
-import { Video } from "@prisma/client";
+import { Log, Video } from "@prisma/client";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-interface RepoProcessingLogsProps {
-  video: Video;
+interface VideoWithLogs extends Video {
+  logs: Log[];
 }
 
-const RepoProcessingLogs = ({ video }: RepoProcessingLogsProps) => {
+interface VideoLogsProps {
+  video: VideoWithLogs;
+}
+
+const VideoLogs = ({ video }: VideoLogsProps) => {
   const router = useRouter();
-  const [logs, setLogs] = useState<ProcessingUpdate[]>([]);
+  const [logs, setLogs] = useState<Log[]>(video.logs);
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`video-${video.id}`);
 
-    channel.bind("processing-update", (update: ProcessingUpdate) => {
+    channel.bind("processing-update", (log: Log) => {
       // Add log line
-      setLogs((prevLogs) => [...prevLogs, update]);
+      setLogs((prevLogs) => [...prevLogs, log]);
 
-      if (update.status === "COMPLETED") {
+      if (log.status === "COMPLETED") {
         console.log("-----------------------------------");
-        console.log("Inside update.status === COMPLETED");
-        console.log("update is ", update);
+        console.log("Inside log.status === COMPLETED");
+        console.log("log is ", log);
         console.log("-----------------------------------");
         router.replace(`/video/${video.id}`);
       }
@@ -81,4 +84,4 @@ const RepoProcessingLogs = ({ video }: RepoProcessingLogsProps) => {
   );
 };
 
-export default RepoProcessingLogs;
+export default VideoLogs;

@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
 
 export function createServiceToken(payload: {
-  repositoryId: string;
+  videoId: string;
   userId: string;
-  githubUrl: string;
 }) {
   const secret = process.env.SERVICE_JWT_SECRET;
 

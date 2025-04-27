@@ -1,17 +1,10 @@
-import { VideoProcessingState } from "@prisma/client";
+import { Log } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-type LogEntry = {
-  id: string;
-  timestamp: Date;
-  message: string;
-  status: VideoProcessingState;
-};
-
 interface TerminalProps {
-  logs: LogEntry[];
+  logs: Log[];
   height?: string;
 }
 
@@ -47,6 +40,15 @@ function Terminal({ logs, height = "400px" }: TerminalProps) {
     }
   };
 
+  const formatDate = (createdAt: Date) => {
+    const date = new Date(createdAt);
+    const formattedTime = `${String(date.getHours()).padStart(2, "0")}:${String(
+      date.getMinutes()
+    ).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+    console.log("formattedTime is ", formattedTime);
+    return `${formattedTime}`;
+  };
+
   return (
     <div className="w-full bg-background">
       <div className="relative">
@@ -63,7 +65,7 @@ function Terminal({ logs, height = "400px" }: TerminalProps) {
                 className="flex items-start space-x-3 animate-in fade-in slide-in-from-bottom-1"
               >
                 <span className="text-muted-foreground">
-                  {new Date(log.timestamp).toLocaleTimeString()}
+                  {formatDate(log.createdAt)}
                 </span>
                 <span className="text-foreground whitespace-pre-wrap">
                   {log.message}

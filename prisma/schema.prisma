@@ -54,7 +54,7 @@ model VerificationToken {
 }
 
 model Video {
-  id               String               @id @default(cuid())
+  id               String      @id @default(cuid())
   youtubeId        String
   title            String
   channelName      String
@@ -62,11 +62,12 @@ model Video {
   channelThumbnail String
   duration         String
   userId           String
-  processingState  VideoProcessingState @default(PENDING)
   overview         String?
-  createdAt        DateTime             @default(now())
+  createdAt        DateTime    @default(now())
+  status           VideoStatus @default(PENDING)
   blogs            Blog[]
-  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs              Log[]
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -85,7 +86,16 @@ model Blog {
   @@index([videoId])
 }
 
-enum VideoProcessingState {
+model Log {
+  id        String      @id
+  videoId   String
+  message   String
+  status    VideoStatus
+  createdAt DateTime    @default(now())
+  Video     Video       @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+enum VideoStatus {
   PENDING
   PROCESSING
   COMPLETED

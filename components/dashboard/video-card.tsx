@@ -1,7 +1,7 @@
 "use client";
 
 import { convertISO8601ToTime } from "@/lib/utils";
-import { Video, VideoProcessingState } from "@prisma/client";
+import { Video, VideoStatus } from "@prisma/client";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,7 +14,7 @@ interface VideoCardProps {
   video: Video;
 }
 
-const getStatusColor = (status: VideoProcessingState) => {
+const getStatusColor = (status: VideoStatus) => {
   if (status === "COMPLETED") {
     return "border-green-500 text-green-500";
   }
@@ -34,13 +34,13 @@ const SidebarVideoCard = ({ video }: VideoCardProps) => {
   }, [message]);
 
   const getHref = () => {
-    if (video.processingState === VideoProcessingState.COMPLETED) {
+    if (video.status === VideoStatus.COMPLETED) {
       return `/video/${video.id}`;
     }
 
     if (
-      video.processingState === VideoProcessingState.PENDING ||
-      video.processingState === VideoProcessingState.PROCESSING
+      video.status === VideoStatus.PENDING ||
+      video.status === VideoStatus.PROCESSING
     ) {
       return `/logs/${video.id}`;
     }
@@ -73,17 +73,17 @@ const VideoCard = ({ video }: VideoCardProps) => {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="rounded-sm object-cover "
         />
-        {video.processingState !== "COMPLETED" && (
+        {video.status !== "COMPLETED" && (
           <>
             <div className="absolute inset-0 bg-muted/80"></div>
             <div className="absolute inset-0 flex items-center justify-center">
               <Badge
                 variant={"outline"}
                 className={`border ${getStatusColor(
-                  video.processingState
+                  video.status
                 )} backdrop-blur-sm`}
               >
-                {video.processingState}
+                {video.status}
               </Badge>
             </div>
           </>
