@@ -30,9 +30,5 @@ export default async function ProcessingLogsPage({
     redirect(`/video/${videoId}`);
   }
 
-  if (video.status === "FAILED") {
-    notFound();
-  }
-
   return <VideoLogs video={video} />;
 }

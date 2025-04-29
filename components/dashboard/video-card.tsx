@@ -38,27 +38,15 @@ const SidebarVideoCard = ({ video }: VideoCardProps) => {
       return `/video/${video.id}`;
     }
 
-    if (
-      video.status === VideoStatus.PENDING ||
-      video.status === VideoStatus.PROCESSING
-    ) {
-      return `/logs/${video.id}`;
-    }
-    return null;
+    return `/logs/${video.id}`;
   };
 
   const href = getHref();
 
-  return href ? (
+  return (
     <Link href={href}>
       <VideoCard video={video} />
     </Link>
-  ) : (
-    <div
-      onClick={() => setMessage("Video Processing Failed! Please Try again")}
-    >
-      <VideoCard video={video} />
-    </div>
   );
 };
 
