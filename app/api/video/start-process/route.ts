@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { createServiceToken } from "@/lib/service-auth";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
@@ -15,11 +14,11 @@ if (!EXPRESS_API_URL) {
   throw new Error("EXPRESS_API_URL is required.");
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json(
+      return Response.json(
         { message: "Sign In to Get Started" },
         { status: 401 }
       );
@@ -29,16 +28,13 @@ export async function POST(req: NextRequest) {
     const { videoUrl } = body;
 
     if (!videoUrl) {
-      return NextResponse.json(
-        { message: "Missing videoUrl" },
-        { status: 400 }
-      );
+      return Response.json({ message: "Missing videoUrl" }, { status: 400 });
     }
 
     // Extract YouTube video ID from URL
     const youtubeId = new URL(videoUrl).searchParams.get("v");
     if (!youtubeId) {
-      return NextResponse.json(
+      return Response.json(
         { message: "Invalid YouTube video URL" },
         { status: 400 }
       );
@@ -51,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     const ytVideoData = await ytVideoResponse.json();
     if (!ytVideoData.items || ytVideoData.items.length === 0) {
-      return NextResponse.json(
+      return Response.json(
         { message: "Video not found on YouTube" },
         { status: 404 }
       );
@@ -112,14 +108,14 @@ export async function POST(req: NextRequest) {
 
     console.log("data --express api is ", data);
 
-    return NextResponse.json({ video }, { status: 201 });
+    return Response.json({ video }, { status: 201 });
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
       console.log("error.message is ", error.message);
     }
-    return NextResponse.json(
-      { message: "Internal server error" },
+    return Response.json(
+      { message: "Failed to start video processing" },
       { status: 500 }
     );
   }

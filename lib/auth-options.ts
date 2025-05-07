@@ -27,6 +27,8 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope: "openid email profile",
+          access_type: "offline",
+          prompt: "consent",
         },
       },
     }),
@@ -41,9 +43,14 @@ export const authOptions: NextAuthOptions = {
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
+
+        console.log("----------------------------------------------------");
         console.log("In jwt callback.");
+        console.log("account.accessToken is ", account.accessToken);
+        console.log("account.refreshToken is ", account.refreshToken);
         console.log("token.accessToken is ", token.accessToken);
         console.log("token.refreshToken is ", token.refreshToken);
+        console.log("----------------------------------------------------");
       }
       return token;
     },
@@ -53,9 +60,6 @@ export const authOptions: NextAuthOptions = {
       }
       session.user.accessToken = token.accessToken as string;
       session.user.refreshToken = token.refreshToken as string;
-      console.log("In session callback.");
-      console.log("session.user.accessToken is ", session.user.accessToken);
-      console.log("session.user.refreshToken is ", session.user.refreshToken);
       return session;
     },
   },
