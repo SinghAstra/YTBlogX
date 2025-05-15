@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { cn, parseYoutubeUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AlertCircle, SearchIcon, SparklesIcon } from "lucide-react";
@@ -23,6 +24,7 @@ import { fetchProcessingVideos, stopVideoProcessing } from "./action";
 
 function CommandPaletteRepoForm() {
   const [url, setUrl] = useState<string>("");
+  const [inspectContent, setInspectContent] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -244,51 +246,34 @@ function CommandPaletteRepoForm() {
         </div>
       )}
 
-      <div
-        className={`rounded-xl border transition-all duration-600   ${
-          showGuide ? "opacity-0" : "opacity-100"
-        }`}
-      >
+      <div className="rounded-xl border transition-all duration-600">
         <form onSubmit={handleSubmit}>
-          <div className="flex items-center border-b px-4 py-3 gap-2">
-            <SearchIcon className="w-5 h-5 text-muted-foreground mr-2" />
-            <input
-              type="text"
-              placeholder="Paste Your Youtube Video URL..."
+          <div className="flex flex-col p-2 gap-2">
+            <Textarea
+              placeholder="Paste Your Youtube Video Inspect Page Content here..."
               value={url}
               onChange={(e) => {
-                setUrl(e.target.value);
+                setInspectContent(e.target.value);
               }}
               disabled={isProcessing}
-              className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground"
+              rows={5}
+              className="flex-1 bg-transparent border focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground resize-none "
             />
-            <kbd className="hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </div>
-
-          <div className="border-t px-4 py-3 flex justify-between items-center">
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <SparklesIcon className="w-4 h-4" />
-              <span>Uses Youtube API</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                disabled={!url || isProcessing}
-                type="submit"
-                className={cn("relative overflow-hidden")}
-              >
-                {isProcessing ? (
-                  <div className="flex items-center">
-                    <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </div>
-                ) : (
-                  "Convert Video"
-                )}
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              disabled={!url || isProcessing}
+              type="submit"
+              className="w-full"
+            >
+              {isProcessing ? (
+                <div className="flex items-center">
+                  <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </div>
+              ) : (
+                "Convert Video"
+              )}
+            </Button>
           </div>
         </form>
       </div>

@@ -24,13 +24,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          scope: "openid email profile",
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
     }),
   ],
 
@@ -39,27 +32,10 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-
-        console.log("----------------------------------------------------");
-        console.log("In jwt callback.");
-        console.log("account.accessToken is ", account.accessToken);
-        console.log("account.refreshToken is ", account.refreshToken);
-        console.log("token.accessToken is ", token.accessToken);
-        console.log("token.refreshToken is ", token.refreshToken);
-        console.log("----------------------------------------------------");
-      }
-      return token;
-    },
     async session({ session, token }) {
       if (token.sub) {
         session.user.id = token.sub;
       }
-      session.user.accessToken = token.accessToken as string;
-      session.user.refreshToken = token.refreshToken as string;
       return session;
     },
   },

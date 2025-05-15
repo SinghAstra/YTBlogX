@@ -38,34 +38,15 @@ export default function SignIn() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-  const isAdmin = searchParams.get("admin") === "true";
-  console.log("isAdmin is ", isAdmin);
-
-  console.log("callbackUrl is ", callbackUrl);
-
-  const baseScope = "openid email profile";
-  const adminScope = "https://www.googleapis.com/auth/youtube.force-ssl ";
-  const scope = isAdmin ? `${baseScope} ${adminScope}` : baseScope;
-
-  const signInParams = isAdmin
-    ? {
-        scope,
-        access_type: "offline",
-        prompt: "consent",
-        callbackUrl,
-        redirect: true,
-      }
-    : {
-        scope,
-        callbackUrl,
-        redirect: true,
-      };
 
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true);
 
-      await signIn("google", signInParams);
+      await signIn("google", {
+        callbackUrl,
+        redirect: true,
+      });
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
