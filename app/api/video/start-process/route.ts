@@ -25,17 +25,15 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { videoUrl } = body;
+    const { youtubeId, transcriptUrl } = body;
 
-    if (!videoUrl) {
-      return Response.json({ message: "Missing videoUrl" }, { status: 400 });
+    if (!youtubeId) {
+      return Response.json({ message: "Missing youtubeId" }, { status: 400 });
     }
 
-    // Extract YouTube video ID from URL
-    const youtubeId = new URL(videoUrl).searchParams.get("v");
-    if (!youtubeId) {
+    if (!transcriptUrl) {
       return Response.json(
-        { message: "Invalid YouTube video URL" },
+        { message: "Missing transcriptUrl" },
         { status: 400 }
       );
     }
@@ -72,9 +70,6 @@ export async function POST(req: Request) {
 
     const channelThumbnail = channelData.snippet.thumbnails.high.url;
 
-    console.log("About to created Video");
-    console.log("session.user.id is ", session.user.id);
-
     // Save new video to DB
     const video = await prisma.video.create({
       data: {
@@ -90,10 +85,12 @@ export async function POST(req: Request) {
     });
 
     console.log("video is ", video);
+    console.log("transcriptUrl is ", transcriptUrl);
 
     const serviceToken = createServiceToken({
       videoId: video.id,
       userId: session.user.id,
+      transcriptUrl,
     });
 
     const response = await fetch(`${EXPRESS_API_URL}/api/queue/video`, {

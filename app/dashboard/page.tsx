@@ -1,6 +1,6 @@
 "use client";
 
-import { addUserVideo, useVideo } from "@/components/context/video";
+import { useToastContext } from "@/components/provider/toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,28 +13,31 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { cn, parseYoutubeUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { AlertCircle, SearchIcon, SparklesIcon } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FaSpinner } from "react-icons/fa";
-import { toast } from "sonner";
 import { fetchProcessingVideos, stopVideoProcessing } from "./action";
 
 function CommandPaletteRepoForm() {
-  const [url, setUrl] = useState<string>("");
   const [inspectContent, setInspectContent] = useState<string>("");
-  const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const searchParams = useSearchParams();
   const pathName = usePathname();
-  const formRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const actionQuery = searchParams.get("action");
   const router = useRouter();
   const [showAlert, setShowAlert] = useState(false);
-  const { dispatch } = useVideo();
+  const { setToastMessage } = useToastContext();
 
   useEffect(() => {
     if (actionQuery === "convert") {
@@ -42,57 +45,99 @@ function CommandPaletteRepoForm() {
     }
   }, [actionQuery]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    const validation = parseYoutubeUrl(url);
-
-    if (!validation.isValid) {
-      setMessage(
-        validation.message ? validation.message : "Invalid Youtube URL"
-      );
-      setIsProcessing(false);
-      return;
-    }
-
-    const pendingVideos = await fetchProcessingVideos();
-
-    if (pendingVideos.length > 0) {
-      setIsProcessing(false);
-      setShowAlert(true);
-      return;
-    }
-
-    processVideos();
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    setInspectContent(value);
   };
 
-  const processVideos = async () => {
-    setIsProcessing(true);
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+    // if Shift+Enter, do nothing (allow newline)
+  };
+
+  const handleSubmit = async () => {
     try {
+      setIsProcessing(true);
+
+      const pendingVideos = await fetchProcessingVideos();
+
+      if (pendingVideos.length > 0) {
+        setIsProcessing(false);
+        setShowAlert(true);
+        return;
+      }
+
+      console.log("inspectContent.length is ", inspectContent.length);
+
+      const pattern = /ytInitialPlayerResponse\s*=\s*({.+?});/;
+      const match = inspectContent.match(pattern);
+
+      if (!match || !match[1]) {
+        setToastMessage(
+          "❌ Couldn't find ytInitialPlayerResponse in the inspect content."
+        );
+        setIsProcessing(false);
+        return;
+      }
+
+      const playerResponse = JSON.parse(match[1]);
+
+      const videoIdMatch = inspectContent.match(/"videoId"\s*:\s*"([^"]+)"/);
+      if (!videoIdMatch || !videoIdMatch[1]) {
+        setToastMessage("❌ Video ID not found in the inspect content.");
+        setIsProcessing(false);
+        return;
+      }
+      const videoId = videoIdMatch[1];
+
+      const tracks =
+        playerResponse?.captions?.playerCaptionsTracklistRenderer
+          ?.captionTracks;
+
+      if (!tracks || tracks.length === 0) {
+        setToastMessage("❌ No captions found for this video.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const transcriptTrack = tracks.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (t: any) => t.languageCode === "en"
+      );
+
+      if (!transcriptTrack) {
+        setToastMessage("❌ English transcript not found.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const transcriptUrl = transcriptTrack.baseUrl + "&fmt=json3";
+      console.log("transcriptUrl is ", transcriptUrl);
+
       const response = await fetch("/api/video/start-process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ videoUrl: url }),
+        body: JSON.stringify({
+          videoId,
+          transcriptUrl,
+        }),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        setMessage(data.message || "Failed to process video");
-      }
-
-      dispatch(addUserVideo(data.video));
-
-      setUrl("");
-      dismissGuide();
-      setMessage("Video Processing Started");
+      console.log("response is ", response);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
         console.log("error.message is ", error.message);
       }
-      setMessage("Check Your Network Connection");
+
+      setToastMessage(
+        error instanceof Error ? error.message : "Could Not Submit Form"
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -102,7 +147,7 @@ function CommandPaletteRepoForm() {
     setIsProcessing(true);
     setShowAlert(false);
     await stopVideoProcessing();
-    processVideos();
+    handleSubmit();
   };
 
   const handleCancelNewVideo = () => {
@@ -110,7 +155,7 @@ function CommandPaletteRepoForm() {
   };
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleDialogView = (e: globalThis.KeyboardEvent) => {
       // Check for Ctrl+K or Cmd+K
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
@@ -118,8 +163,8 @@ function CommandPaletteRepoForm() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleDialogView);
+    return () => window.removeEventListener("keydown", handleDialogView);
   }, []);
 
   const dismissGuide = useCallback(() => {
@@ -131,7 +176,10 @@ function CommandPaletteRepoForm() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+      if (
+        dialogRef.current &&
+        !dialogRef.current.contains(event.target as Node)
+      ) {
         dismissGuide();
       }
     };
@@ -144,12 +192,6 @@ function CommandPaletteRepoForm() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showGuide, dismissGuide]);
-
-  useEffect(() => {
-    if (!message) return;
-    toast(message);
-    setMessage(null);
-  }, [message]);
 
   return (
     <div className="m-2 w-full">
@@ -197,85 +239,68 @@ function CommandPaletteRepoForm() {
                 stiffness: 260,
                 damping: 20,
               }}
-              ref={formRef}
+              ref={dialogRef}
             >
-              <form onSubmit={handleSubmit}>
-                <div className="flex items-center border-b px-4 py-3 gap-2">
-                  <SearchIcon className="w-5 h-5 text-muted-foreground mr-2" />
-                  <input
-                    type="text"
-                    placeholder="Paste Your Youtube Video URL..."
-                    value={url}
-                    onChange={(e) => {
-                      setUrl(e.target.value);
-                    }}
+              <div className="rounded-xl border transition-all duration-600">
+                <div className="flex flex-col p-2 gap-2">
+                  <Textarea
+                    placeholder="Paste Your Youtube Video Inspect Page Content here..."
+                    value={inspectContent}
+                    onChange={handleChange}
                     disabled={isProcessing}
-                    className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground"
+                    rows={5}
+                    onKeyDown={handleKeyDown}
+                    className="flex-1 bg-transparent border focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground resize-none "
                   />
-                  <kbd className="hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium opacity-100">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
+                  <Button
+                    size="sm"
+                    disabled={!inspectContent || isProcessing}
+                    onClick={handleSubmit}
+                    className="w-full"
+                  >
+                    {isProcessing ? (
+                      <div className="flex items-center">
+                        <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </div>
+                    ) : (
+                      "Convert Video"
+                    )}
+                  </Button>
                 </div>
-
-                <div className="border-t px-4 py-3 flex justify-between items-center">
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <SparklesIcon className="w-4 h-4" />
-                    <span>Uses Youtube API</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      disabled={!url || isProcessing}
-                      type="submit"
-                      className={cn("relative overflow-hidden")}
-                    >
-                      {isProcessing ? (
-                        <div className="flex items-center">
-                          <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </div>
-                      ) : (
-                        "Convert Video"
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </form>
+              </div>
             </motion.div>
           </div>
         </div>
       )}
 
       <div className="rounded-xl border transition-all duration-600">
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col p-2 gap-2">
-            <Textarea
-              placeholder="Paste Your Youtube Video Inspect Page Content here..."
-              value={url}
-              onChange={(e) => {
-                setInspectContent(e.target.value);
-              }}
-              disabled={isProcessing}
-              rows={5}
-              className="flex-1 bg-transparent border focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground resize-none "
-            />
-            <Button
-              size="sm"
-              disabled={!url || isProcessing}
-              type="submit"
-              className="w-full"
-            >
-              {isProcessing ? (
-                <div className="flex items-center">
-                  <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </div>
-              ) : (
-                "Convert Video"
-              )}
-            </Button>
-          </div>
-        </form>
+        <div className="flex flex-col p-2 gap-2">
+          <Textarea
+            placeholder="Paste Your Youtube Video Inspect Page Content here..."
+            value={inspectContent}
+            onChange={handleChange}
+            disabled={isProcessing}
+            rows={5}
+            onKeyDown={handleKeyDown}
+            className="flex-1 bg-transparent border focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground resize-none "
+          />
+          <Button
+            size="sm"
+            disabled={!inspectContent || isProcessing}
+            onClick={handleSubmit}
+            className="w-full"
+          >
+            {isProcessing ? (
+              <div className="flex items-center">
+                <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </div>
+            ) : (
+              "Convert Video"
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
