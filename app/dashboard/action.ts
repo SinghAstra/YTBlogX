@@ -1,5 +1,6 @@
 "use server";
 
+import { VideoInfo } from "@/interfaces/video";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { createCleanJobsToken } from "@/lib/service-auth";
@@ -109,6 +110,64 @@ export async function stopVideoProcessing() {
         status: "FAILED",
       },
     });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
+  }
+}
+
+export async function getVideoInfo(videoId: string) {
+  try {
+    const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+
+    if (!YOUTUBE_API_KEY) {
+      throw new Error("YOUTUBE_API_KEY is required.");
+    }
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return null;
+    }
+
+    const ytVideoResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`
+    );
+
+    const ytVideoData = await ytVideoResponse.json();
+    if (!ytVideoData.items || ytVideoData.items.length === 0) {
+      return;
+    }
+
+    const videoData = ytVideoData.items[0];
+    const {
+      title,
+      channelTitle: channelName,
+      thumbnails,
+      channelId,
+    } = videoData.snippet;
+    const videoThumbnail = thumbnails.maxres.url;
+    const duration = videoData.contentDetails.duration;
+
+    const ytChannelResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
+    );
+
+    const ytChannelData = await ytChannelResponse.json();
+    const channelData = ytChannelData.items[0];
+
+    const channelThumbnail = channelData.snippet.thumbnails.high.url;
+
+    const videoDetails = {
+      title,
+      channelName,
+      videoThumbnail,
+      channelThumbnail,
+      duration,
+    };
+
+    return videoDetails as VideoInfo;
   } catch (error) {
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
