@@ -25,10 +25,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { youtubeId, transcriptUrl } = body;
+    const { videoId, transcriptUrl } = body;
 
-    if (!youtubeId) {
-      return Response.json({ message: "Missing youtubeId" }, { status: 400 });
+    console.log("videoId is ", videoId);
+    console.log("transcriptUrl is ", transcriptUrl);
+
+    if (!videoId) {
+      return Response.json({ message: "Missing videoId" }, { status: 400 });
     }
 
     if (!transcriptUrl) {
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
 
     // Fetch video data from YouTube API
     const ytVideoResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${youtubeId}&key=${YOUTUBE_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`
     );
 
     const ytVideoData = await ytVideoResponse.json();
@@ -73,7 +76,7 @@ export async function POST(req: Request) {
     // Save new video to DB
     const video = await prisma.video.create({
       data: {
-        youtubeId,
+        youtubeId: videoId,
         userId: session.user.id,
         title,
         channelName,
@@ -85,6 +88,7 @@ export async function POST(req: Request) {
     });
 
     console.log("video is ", video);
+    console.log("session.user.id is ", session.user.id);
     console.log("transcriptUrl is ", transcriptUrl);
 
     const serviceToken = createServiceToken({
