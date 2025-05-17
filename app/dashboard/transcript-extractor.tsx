@@ -3,43 +3,39 @@
 import { useToastContext } from "@/components/provider/toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoInfo } from "@/interfaces/video";
-import { AlertCircle, InfoIcon as InfoCircle } from "lucide-react";
+import { InfoIcon as InfoCircle } from "lucide-react";
 import { useState } from "react";
 import { getVideoInfo } from "./action";
 import { FileUploader } from "./file-uploader";
-import { Steps } from "./steps";
 import { VideoPreview } from "./video-preview";
 
 export function TranscriptExtractor() {
   const [videoUrl, setVideoUrl] = useState("");
   const [videoId, setVideoId] = useState("");
-  const [activeTab, setActiveTab] = useState("url");
   const [step, setStep] = useState(1);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [transcriptData, setTranscriptData] = useState<any>(null);
   const [videoDetails, setVideoDetails] = useState<VideoInfo | null>(null);
+  const [scriptContent, setScriptContent] = useState("");
+  const [transcriptUrl, setTranscriptUrl] = useState("");
 
   const { setToastMessage } = useToastContext();
 
   const extractVideoId = (url: string) => {
-    const regExp =
-      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[7].length === 11 ? match[7] : null;
+    const match = url.match(
+      /(?:youtube\.com\/.*v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+
+    if (!match || !match[1]) {
+      throw new Error("Invalid Youtube URL");
+    }
+    return match[1];
   };
 
-  const handleUrlSubmit = () => {
+  const handleUrlSubmit = async () => {
     const id = extractVideoId(videoUrl);
     if (!id) {
       setToastMessage("Please enter a valid YouTube video URL");
@@ -47,7 +43,7 @@ export function TranscriptExtractor() {
     }
 
     setVideoId(id);
-    fetchVideoDetails(id);
+    await fetchVideoDetails(id);
     setStep(2);
   };
 
@@ -83,125 +79,175 @@ export function TranscriptExtractor() {
     }
   };
 
-  const processTranscript = () => {
-    // Process the transcript data here
-    // This would be your application's main functionality
-    setStep(4);
-    setToastMessage("Your transcript has been processed successfully");
+  const handleKeyDownInputYoutubeURL = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (videoUrl.trim()) {
+        handleUrlSubmit();
+      }
+    }
+    // if Shift+Enter, do nothing (allow newline)
+  };
+
+  const handleKeyDownScriptContent = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (scriptContent.trim()) {
+        extractTranscriptUrlFromScript();
+      }
+    }
+    // if Shift+Enter, do nothing (allow newline)
+  };
+
+  const extractTranscriptUrlFromScript = () => {
+    try {
+      const match = scriptContent.match(
+        /ytInitialPlayerResponse\s*=\s*(\{.*?\});/
+      )?.[1];
+      if (!match) throw new Error("ytInitialPlayerResponse not found");
+
+      const playerResponse = JSON.parse(match);
+      const url =
+        playerResponse?.captions?.playerCaptionsTracklistRenderer
+          ?.captionTracks?.[0]?.baseUrl;
+
+      if (!url) throw new Error("captionTracks baseUrl not found");
+
+      setTranscriptUrl(url + "&fmt=json3");
+      setToastMessage("Transcript URL extracted successfully!");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
+      setToastMessage(
+        error instanceof Error ? error.message : "Failed to extract URL"
+      );
+    }
+  };
+
+  const downloadTranscript = () => {
+    if (!transcriptUrl) {
+      setToastMessage("Transcript URL is not available yet");
+      return;
+    }
+    setToastMessage("Downloading Transcript..");
+    // open the transcript URL in a new tab for manual download
+    window.open(transcriptUrl, "_blank");
+    setStep(3);
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Extract YouTube Video Transcript</CardTitle>
-        <CardDescription>
-          Follow the steps below to extract and process a YouTube video
-          transcript
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Steps currentStep={step} />
-
+    <div className="w-full border rounded m-2 px-3 py-2 bg-muted/20 flex flex-col gap-2">
+      <div>
+        <h2>Extract YouTube Video Transcript</h2>
+        <p className="text-muted-foreground">
+          Follow the steps below to generate blogs
+        </p>
+      </div>
+      <div>
         {step === 1 && (
-          <div className="space-y-4 mt-6">
-            <h3 className="text-lg font-medium">
-              Step 1: Enter YouTube Video Information
-            </h3>
-            <Tabs
-              defaultValue="url"
-              value={activeTab}
-              onValueChange={setActiveTab}
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="url">Video URL</TabsTrigger>
-                <TabsTrigger value="id">Video ID</TabsTrigger>
-              </TabsList>
-              <TabsContent value="url" className="space-y-4 mt-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                  />
-                  <Button onClick={handleUrlSubmit}>Next</Button>
-                </div>
-              </TabsContent>
-              <TabsContent value="id" className="space-y-4 mt-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="dQw4w9WgXcQ"
-                    value={videoId}
-                    onChange={(e) => setVideoId(e.target.value)}
-                  />
-                  <Button
-                    onClick={() => {
-                      if (videoId.length === 11) {
-                        fetchVideoDetails(videoId);
-                        setStep(2);
-                      } else {
-                        setToastMessage(
-                          "Please enter a valid YouTube video ID"
-                        );
-                      }
-                    }}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
+          <div className="space-y-2">
+            <h3 className="text-lg">Step 1: Enter YouTube Video URL</h3>
+
+            <div className="flex gap-1">
+              <Input
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={videoUrl}
+                className="rounded rounded-r-none"
+                onChange={(e) => setVideoUrl(e.target.value)}
+                onKeyDown={handleKeyDownInputYoutubeURL}
+              />
+              <Button
+                variant={"outline"}
+                className=" rounded rounded-l-none"
+                onClick={handleUrlSubmit}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         )}
 
         {step === 2 && (
-          <div className="space-y-4 mt-6">
-            <h3 className="text-lg font-medium">
-              Step 2: Get Transcript JSON File
-            </h3>
+          <div className="space-y-2">
+            <h3 className="text-lg ">Step 2: Get Transcript JSON File</h3>
 
             {videoDetails && <VideoPreview videoDetails={videoDetails} />}
 
             <Alert>
               <InfoCircle className="h-4 w-4" />
               <AlertTitle>Manual step required</AlertTitle>
-              <AlertDescription>
+              <AlertDescription className="flex flex-col gap-2">
                 Due to YouTube&apos;s restrictions, you need to manually
                 download the transcript JSON file. Follow these steps:
                 <ol className="list-decimal list-inside mt-2 space-y-2">
                   <li>
-                    Open the video in YouTube:{" "}
+                    Open the video in YouTube :{" "}
                     <a
                       href={`https://www.youtube.com/watch?v=${videoId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
+                      className="text-purple-500 hover:underline"
                     >
                       Open Video
                     </a>
                   </li>
                   <li>
-                    Right-click on the page and select &quot;Inspect&quot; or
-                    press F12
+                    Right-click on the page and select{" "}
+                    <span className="text-purple-500">Inspect</span>
                   </li>
                   <li>
-                    Go to the &quot;Network&quot; tab in the developer tools
-                  </li>
-                  <li>Enable captions on the YouTube video</li>
-                  <li>
-                    Look for a request with &quot;timedtext&quot; in the name
+                    Navigate to{" "}
+                    <span className="text-purple-500">Elements</span> Tab
                   </li>
                   <li>
-                    Click on that request, go to the &quot;Response&quot; tab
+                    Click on any HTML Element and then press <kbd>Ctrl</kbd> +{" "}
+                    <kbd>F</kbd> and search for{" "}
+                    <span className="text-purple-500">
+                      ytInitialPlayerResponse
+                    </span>
                   </li>
                   <li>
-                    Right-click and select &quot;Save as...&quot; to download
-                    the JSON file
+                    Copy the script tag containing ytInitialPlayerResponse and
+                    paste it below
                   </li>
                 </ol>
+                {!transcriptUrl && (
+                  <div className="flex flex-col gap-2">
+                    <Textarea
+                      placeholder="Paste the full <script>...</script> content that contains ytInitialPlayerResponse"
+                      rows={6}
+                      value={scriptContent}
+                      onChange={(e) => setScriptContent(e.target.value)}
+                      onKeyDown={handleKeyDownScriptContent}
+                      className="resize-none"
+                    />
+
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={extractTranscriptUrlFromScript}
+                    >
+                      Extract Transcript URL
+                    </Button>
+                  </div>
+                )}
+                {transcriptUrl && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={downloadTranscript}
+                  >
+                    Download Transcript
+                  </Button>
+                )}
               </AlertDescription>
             </Alert>
-
-            <FileUploader onFileLoaded={handleFileUpload} />
 
             <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep(1)}>
@@ -213,29 +259,9 @@ export function TranscriptExtractor() {
 
         {step === 3 && (
           <div className="space-y-4 mt-6">
-            <h3 className="text-lg font-medium">Step 3: Process Transcript</h3>
+            <h3 className="text-lg font-medium">Step 3: Upload Transcript</h3>
 
-            {transcriptData && (
-              <div className="space-y-4">
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Transcript loaded successfully</AlertTitle>
-                  <AlertDescription>
-                    Your transcript has been loaded and is ready to be
-                    processed.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="max-h-60 overflow-y-auto border rounded-md p-4">
-                  <pre className="text-sm whitespace-pre-wrap">
-                    {JSON.stringify(transcriptData, null, 2).substring(0, 500)}
-                    ...
-                  </pre>
-                </div>
-
-                <Button onClick={processTranscript}>Process Transcript</Button>
-              </div>
-            )}
+            <FileUploader onFileLoaded={handleFileUpload} />
 
             <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep(2)}>
@@ -288,7 +314,7 @@ export function TranscriptExtractor() {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

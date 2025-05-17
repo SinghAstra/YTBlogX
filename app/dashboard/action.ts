@@ -128,7 +128,7 @@ export async function getVideoInfo(videoId: string) {
     const session = await getServerSession(authOptions);
 
     if (!session) {
-      return null;
+      throw new Error("Unauthenticated User");
     }
 
     const ytVideoResponse = await fetch(
@@ -136,8 +136,9 @@ export async function getVideoInfo(videoId: string) {
     );
 
     const ytVideoData = await ytVideoResponse.json();
+    console.log("ytVideoData is ", ytVideoData);
     if (!ytVideoData.items || ytVideoData.items.length === 0) {
-      return;
+      throw new Error("No items Found.");
     }
 
     const videoData = ytVideoData.items[0];
