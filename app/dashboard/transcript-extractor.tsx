@@ -17,8 +17,8 @@ export function TranscriptExtractor() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [videoDetails, setVideoDetails] = useState<VideoInfo | null>(null);
   const [scriptContent, setScriptContent] = useState("");
-  const [transcript, setTranscript] = useState("");
   const [isSubmittingUrl, setIsSubmittingUrl] = useState(false);
+  const [isSubmittingScript, setIsSubmittingScript] = useState(false);
 
   const { setToastMessage } = useToastContext();
 
@@ -121,12 +121,15 @@ export function TranscriptExtractor() {
       let transcript = "";
       for (let i = 0; i < texts.length; i++) {
         const text = texts[i].textContent;
+        console.log("text is ", text);
         if (text?.trim()) {
           transcript += text.replace(/[^\x00-\x7F]/g, "") + " ";
         }
       }
 
-      setTranscript(transcript);
+      console.log("transcript is ", transcript);
+
+      handleSubmit(transcript);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
@@ -135,6 +138,42 @@ export function TranscriptExtractor() {
       setToastMessage(
         error instanceof Error ? error.message : "Failed to extract URL"
       );
+    }
+  };
+
+  const handleSubmit = async (transcript: string) => {
+    try {
+      setIsSubmittingScript(true);
+      const response = await fetch("/api/video/start-process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoId,
+          transcript,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("data is ", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to Submit.");
+      }
+      setVideoUrl("");
+      setStep(1);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("error.stack is ", error.stack);
+        console.log("error.message is ", error.message);
+      }
+      setToastMessage(
+        error instanceof Error ? error.message : "Failed to submit"
+      );
+    } finally {
+      setIsSubmittingScript(false);
     }
   };
 
@@ -231,11 +270,17 @@ export function TranscriptExtractor() {
                 variant="outline"
                 className="w-full rounded"
                 onClick={extractTranscriptUrlFromScript}
+                disabled={isSubmittingScript}
               >
-                Extract Transcript URL
+                {isSubmittingScript ? (
+                  <div className="flex gap-2">
+                    <Loader2 /> Wait ...
+                  </div>
+                ) : (
+                  "Generate Blogs"
+                )}
               </Button>
             </div>
-            <p>{transcript}</p>
 
             <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep(1)}>

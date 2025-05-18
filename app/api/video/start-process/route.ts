@@ -25,20 +25,17 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { videoId, transcriptUrl } = body;
+    const { videoId, transcript } = body;
 
     console.log("videoId is ", videoId);
-    console.log("transcriptUrl is ", transcriptUrl);
+    console.log("transcript is ", transcript);
 
     if (!videoId) {
       return Response.json({ message: "Missing videoId" }, { status: 400 });
     }
 
-    if (!transcriptUrl) {
-      return Response.json(
-        { message: "Missing transcriptUrl" },
-        { status: 400 }
-      );
+    if (!transcript) {
+      return Response.json({ message: "Missing transcript" }, { status: 400 });
     }
 
     // Fetch video data from YouTube API
@@ -83,18 +80,17 @@ export async function POST(req: Request) {
         videoThumbnail,
         channelThumbnail,
         duration,
+        transcript,
         status: "PENDING",
       },
     });
 
     console.log("video is ", video);
     console.log("session.user.id is ", session.user.id);
-    console.log("transcriptUrl is ", transcriptUrl);
 
     const serviceToken = createServiceToken({
       videoId: video.id,
       userId: session.user.id,
-      transcriptUrl,
     });
 
     const response = await fetch(`${EXPRESS_API_URL}/api/queue/video`, {

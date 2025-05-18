@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 export function createServiceToken(payload: {
   videoId: string;
   userId: string;
-  transcriptUrl: string;
 }) {
   const secret = process.env.SERVICE_JWT_SECRET;
 
