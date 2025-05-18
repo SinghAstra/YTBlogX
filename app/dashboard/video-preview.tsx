@@ -1,24 +1,24 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
 import { VideoInfo } from "@/interfaces/video";
 import Image from "next/image";
 import { useState } from "react";
 
 interface VideoPreviewProps {
   videoDetails: VideoInfo;
+  videoId: string;
 }
 
-export function VideoPreview({ videoDetails }: VideoPreviewProps) {
+export function VideoPreview({ videoDetails, videoId }: VideoPreviewProps) {
   const { title, channelName, videoThumbnail, channelThumbnail } = videoDetails;
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-4">
+    <a href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank">
+      <div className="p-4 bg-muted/20 hover:bg-muted/40 transition rounded ">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="w-full md:w-1/3 aspect-video relative rounded-md overflow-hidden">
+          <div className="w-full md:w-1/3 aspect-video relative rounded overflow-hidden">
             {!isImageLoaded && (
               <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-muted/20 via-muted/40 to-muted/60" />
             )}
@@ -31,7 +31,7 @@ export function VideoPreview({ videoDetails }: VideoPreviewProps) {
               className="object-cover "
             />
           </div>
-          <div className="w-full md:w-2/3">
+          <div className="w-full md:w-2/3 flex flex-col gap-2">
             <h3 className="text-lg font-semibold line-clamp-2">{title}</h3>
             <div className=" flex gap-2 items-center ">
               <Avatar>
@@ -45,7 +45,7 @@ export function VideoPreview({ videoDetails }: VideoPreviewProps) {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </a>
   );
 }

@@ -145,7 +145,7 @@ export function TranscriptExtractor() {
   };
 
   return (
-    <div className="w-full border rounded m-2 px-3 py-2 bg-muted/20 flex flex-col gap-2">
+    <div className="max-w-3xl w-full  flex flex-col gap-6  mx-auto border rounded m-2 px-3 py-2 bg-muted/10">
       <div>
         <h2>Extract YouTube Video Transcript</h2>
         <p className="text-muted-foreground">
@@ -187,12 +187,11 @@ export function TranscriptExtractor() {
           <div className="space-y-2">
             <h3 className="text-lg ">Step 2: Get Transcript JSON File</h3>
 
-            {videoDetails && <VideoPreview videoDetails={videoDetails} />}
-
-            <Alert>
-              <InfoCircle className="h-4 w-4" />
-              <AlertTitle>Manual step required</AlertTitle>
-              <AlertDescription className="flex flex-col gap-2">
+            {videoDetails && (
+              <VideoPreview videoDetails={videoDetails} videoId={videoId} />
+            )}
+            {!transcriptUrl && (
+              <div className="flex flex-col gap-2 p-4 ">
                 Due to YouTube&apos;s restrictions, you need to manually
                 download the transcript JSON file. Follow these steps:
                 <ol className="list-decimal list-inside mt-2 space-y-2">
@@ -227,37 +226,32 @@ export function TranscriptExtractor() {
                     paste it below
                   </li>
                 </ol>
-                {!transcriptUrl && (
-                  <div className="flex flex-col gap-2">
-                    <Textarea
-                      placeholder="Paste the full <script>...</script> content that contains ytInitialPlayerResponse"
-                      rows={6}
-                      value={scriptContent}
-                      onChange={(e) => setScriptContent(e.target.value)}
-                      onKeyDown={handleKeyDownScriptContent}
-                      className="resize-none"
-                    />
-
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={extractTranscriptUrlFromScript}
-                    >
-                      Extract Transcript URL
-                    </Button>
-                  </div>
-                )}
-                {transcriptUrl && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={downloadTranscript}
-                  >
-                    Download Transcript
-                  </Button>
-                )}
-              </AlertDescription>
-            </Alert>
+                <Textarea
+                  placeholder="Paste the full <script>...</script> content that contains ytInitialPlayerResponse"
+                  rows={6}
+                  value={scriptContent}
+                  onChange={(e) => setScriptContent(e.target.value)}
+                  onKeyDown={handleKeyDownScriptContent}
+                  className="resize-none rounded"
+                />
+                <Button
+                  variant="outline"
+                  className="w-full rounded"
+                  onClick={extractTranscriptUrlFromScript}
+                >
+                  Extract Transcript URL
+                </Button>
+              </div>
+            )}
+            {transcriptUrl && (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={downloadTranscript}
+              >
+                Download Transcript
+              </Button>
+            )}
 
             <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep(1)}>
