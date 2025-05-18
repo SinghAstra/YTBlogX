@@ -82,13 +82,13 @@ export function TranscriptExtractor() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (scriptContent.trim()) {
-        extractTranscriptUrlFromScript();
+        handleSubmit();
       }
     }
     // if Shift+Enter, do nothing (allow newline)
   };
 
-  const extractTranscriptUrlFromScript = async () => {
+  const extractTranscriptFromScript = async () => {
     try {
       const match = scriptContent.match(
         /ytInitialPlayerResponse\s*=\s*(\{.*?\});/
@@ -121,7 +121,6 @@ export function TranscriptExtractor() {
       let transcript = "";
       for (let i = 0; i < texts.length; i++) {
         const text = texts[i].textContent;
-        console.log("text is ", text);
         if (text?.trim()) {
           transcript += text.replace(/[^\x00-\x7F]/g, "") + " ";
         }
@@ -129,7 +128,7 @@ export function TranscriptExtractor() {
 
       console.log("transcript is ", transcript);
 
-      handleSubmit(transcript);
+      return transcript;
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
@@ -138,12 +137,20 @@ export function TranscriptExtractor() {
       setToastMessage(
         error instanceof Error ? error.message : "Failed to extract URL"
       );
+      return null;
     }
   };
 
-  const handleSubmit = async (transcript: string) => {
+  const handleSubmit = async () => {
     try {
       setIsSubmittingScript(true);
+
+      const transcript = await extractTranscriptFromScript();
+
+      if (!transcript) {
+        throw new Error("Transcript not Found.");
+      }
+
       const response = await fetch("/api/video/start-process", {
         method: "POST",
         headers: {
@@ -206,7 +213,7 @@ export function TranscriptExtractor() {
               >
                 {isSubmittingUrl ? (
                   <div className="flex gap-2">
-                    <Loader2 /> Wait ...
+                    <Loader2 className="h-4 w-4 animate-spin" /> Wait ...
                   </div>
                 ) : (
                   "Next"
@@ -269,12 +276,12 @@ export function TranscriptExtractor() {
               <Button
                 variant="outline"
                 className="w-full rounded"
-                onClick={extractTranscriptUrlFromScript}
+                onClick={handleSubmit}
                 disabled={isSubmittingScript}
               >
                 {isSubmittingScript ? (
                   <div className="flex gap-2">
-                    <Loader2 /> Wait ...
+                    <Loader2 className="h-4 w-4 animate-spin" /> Wait ...
                   </div>
                 ) : (
                   "Generate Blogs"
