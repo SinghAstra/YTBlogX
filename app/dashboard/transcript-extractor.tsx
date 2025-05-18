@@ -1,15 +1,13 @@
 "use client";
 
 import { useToastContext } from "@/components/provider/toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoInfo } from "@/interfaces/video";
-import { InfoIcon as InfoCircle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { getVideoInfo } from "./action";
-import { FileUploader } from "./file-uploader";
 import { VideoPreview } from "./video-preview";
 
 export function TranscriptExtractor() {
@@ -17,10 +15,9 @@ export function TranscriptExtractor() {
   const [videoId, setVideoId] = useState("");
   const [step, setStep] = useState(1);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [transcriptData, setTranscriptData] = useState<any>(null);
   const [videoDetails, setVideoDetails] = useState<VideoInfo | null>(null);
   const [scriptContent, setScriptContent] = useState("");
-  const [transcriptUrl, setTranscriptUrl] = useState("");
+  const [transcript, setTranscript] = useState("");
   const [isSubmittingUrl, setIsSubmittingUrl] = useState(false);
 
   const { setToastMessage } = useToastContext();
@@ -67,21 +64,6 @@ export function TranscriptExtractor() {
     }
   };
 
-  const handleFileUpload = (fileContent: string) => {
-    try {
-      const data = JSON.parse(fileContent);
-      setTranscriptData(data);
-      setStep(3);
-      setToastMessage("Transcript data loaded successfully");
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("error.stack is ", error.stack);
-        console.log("error.message is ", error.message);
-      }
-      setToastMessage("The file does not contain valid JSON data");
-    }
-  };
-
   const handleKeyDownInputYoutubeURL = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -106,7 +88,7 @@ export function TranscriptExtractor() {
     // if Shift+Enter, do nothing (allow newline)
   };
 
-  const extractTranscriptUrlFromScript = () => {
+  const extractTranscriptUrlFromScript = async () => {
     try {
       const match = scriptContent.match(
         /ytInitialPlayerResponse\s*=\s*(\{.*?\});/
@@ -114,14 +96,37 @@ export function TranscriptExtractor() {
       if (!match) throw new Error("ytInitialPlayerResponse not found");
 
       const playerResponse = JSON.parse(match);
-      const url =
+      const transcriptUrl: string =
         playerResponse?.captions?.playerCaptionsTracklistRenderer
           ?.captionTracks?.[0]?.baseUrl;
 
-      if (!url) throw new Error("captionTracks baseUrl not found");
+      if (!transcriptUrl) throw new Error("captionTracks baseUrl not found");
 
-      setTranscriptUrl(url + "&fmt=json3");
-      setToastMessage("Transcript URL extracted successfully!");
+      const transcriptUrlInitial = "https://www.youtube.com";
+      const parsedTranscriptUrl = transcriptUrl.startsWith(transcriptUrlInitial)
+        ? transcriptUrl
+        : `${transcriptUrlInitial}${transcriptUrl}`;
+
+      const transcriptRes = await fetch(parsedTranscriptUrl);
+      console.log("transcriptRes is ", transcriptRes);
+
+      const transcriptXml = await transcriptRes.text();
+
+      console.log("transcriptXml is ", transcriptXml);
+
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(transcriptXml, "text/xml");
+      const texts = xmlDoc.getElementsByTagName("text");
+
+      let transcript = "";
+      for (let i = 0; i < texts.length; i++) {
+        const text = texts[i].textContent;
+        if (text?.trim()) {
+          transcript += text.replace(/[^\x00-\x7F]/g, "") + " ";
+        }
+      }
+
+      setTranscript(transcript);
     } catch (error) {
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
@@ -131,17 +136,6 @@ export function TranscriptExtractor() {
         error instanceof Error ? error.message : "Failed to extract URL"
       );
     }
-  };
-
-  const downloadTranscript = () => {
-    if (!transcriptUrl) {
-      setToastMessage("Transcript URL is not available yet");
-      return;
-    }
-    setToastMessage("Downloading Transcript..");
-    // open the transcript URL in a new tab for manual download
-    window.open(transcriptUrl, "_blank");
-    setStep(3);
   };
 
   return (
@@ -190,130 +184,62 @@ export function TranscriptExtractor() {
             {videoDetails && (
               <VideoPreview videoDetails={videoDetails} videoId={videoId} />
             )}
-            {!transcriptUrl && (
-              <div className="flex flex-col gap-2 p-4 ">
-                Due to YouTube&apos;s restrictions, you need to manually
-                download the transcript JSON file. Follow these steps:
-                <ol className="list-decimal list-inside mt-2 space-y-2">
-                  <li>
-                    Open the video in YouTube :{" "}
-                    <a
-                      href={`https://www.youtube.com/watch?v=${videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-purple-500 hover:underline"
-                    >
-                      Open Video
-                    </a>
-                  </li>
-                  <li>
-                    Right-click on the page and select{" "}
-                    <span className="text-purple-500">Inspect</span>
-                  </li>
-                  <li>
-                    Navigate to{" "}
-                    <span className="text-purple-500">Elements</span> Tab
-                  </li>
-                  <li>
-                    Click on any HTML Element and then press <kbd>Ctrl</kbd> +{" "}
-                    <kbd>F</kbd> and search for{" "}
-                    <span className="text-purple-500">
-                      ytInitialPlayerResponse
-                    </span>
-                  </li>
-                  <li>
-                    Copy the script tag containing ytInitialPlayerResponse and
-                    paste it below
-                  </li>
-                </ol>
-                <Textarea
-                  placeholder="Paste the full <script>...</script> content that contains ytInitialPlayerResponse"
-                  rows={6}
-                  value={scriptContent}
-                  onChange={(e) => setScriptContent(e.target.value)}
-                  onKeyDown={handleKeyDownScriptContent}
-                  className="resize-none rounded"
-                />
-                <Button
-                  variant="outline"
-                  className="w-full rounded"
-                  onClick={extractTranscriptUrlFromScript}
-                >
-                  Extract Transcript URL
-                </Button>
-              </div>
-            )}
-            {transcriptUrl && (
+            <div className="flex flex-col gap-2 p-4 ">
+              Due to YouTube&apos;s restrictions, you need to manually download
+              the transcript JSON file. Follow these steps:
+              <ol className="list-decimal list-inside mt-2 space-y-2">
+                <li>
+                  Open the video in YouTube :{" "}
+                  <a
+                    href={`https://www.youtube.com/watch?v=${videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-500 hover:underline"
+                  >
+                    Open Video
+                  </a>
+                </li>
+                <li>
+                  Right-click on the page and select{" "}
+                  <span className="text-purple-500">Inspect</span>
+                </li>
+                <li>
+                  Navigate to <span className="text-purple-500">Elements</span>{" "}
+                  Tab
+                </li>
+                <li>
+                  Click on any HTML Element and then press <kbd>Ctrl</kbd> +{" "}
+                  <kbd>F</kbd> and search for{" "}
+                  <span className="text-purple-500">
+                    ytInitialPlayerResponse
+                  </span>
+                </li>
+                <li>
+                  Copy the script tag containing ytInitialPlayerResponse and
+                  paste it below
+                </li>
+              </ol>
+              <Textarea
+                placeholder="Paste the full <script>...</script> content that contains ytInitialPlayerResponse"
+                rows={6}
+                value={scriptContent}
+                onChange={(e) => setScriptContent(e.target.value)}
+                onKeyDown={handleKeyDownScriptContent}
+                className="resize-none rounded"
+              />
               <Button
                 variant="outline"
-                className="w-full"
-                onClick={downloadTranscript}
+                className="w-full rounded"
+                onClick={extractTranscriptUrlFromScript}
               >
-                Download Transcript
+                Extract Transcript URL
               </Button>
-            )}
+            </div>
+            <p>{transcript}</p>
 
             <div className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setStep(1)}>
                 Back
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-4 mt-6">
-            <h3 className="text-lg font-medium">Step 3: Upload Transcript</h3>
-
-            <FileUploader onFileLoaded={handleFileUpload} />
-
-            <div className="flex justify-between mt-4">
-              <Button variant="outline" onClick={() => setStep(2)}>
-                Back
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-4 mt-6">
-            <h3 className="text-lg font-medium">Step 4: Results</h3>
-
-            <Alert className="bg-green-50 border-green-200">
-              <InfoCircle className="h-4 w-4 text-green-500" />
-              <AlertTitle className="text-green-700">
-                Processing Complete
-              </AlertTitle>
-              <AlertDescription className="text-green-600">
-                Your transcript has been processed successfully. You can now
-                view the results below.
-              </AlertDescription>
-            </Alert>
-
-            <Textarea
-              className="min-h-[200px]"
-              readOnly
-              value={
-                transcriptData
-                  ? "Processed transcript content would appear here..."
-                  : ""
-              }
-            />
-
-            <div className="flex justify-between mt-4">
-              <Button variant="outline" onClick={() => setStep(3)}>
-                Back
-              </Button>
-              <Button
-                onClick={() => {
-                  setVideoUrl("");
-                  setVideoId("");
-                  setTranscriptData(null);
-                  setVideoDetails(null);
-                  setStep(1);
-                }}
-              >
-                Start New
               </Button>
             </div>
           </div>
