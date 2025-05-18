@@ -136,7 +136,6 @@ export async function getVideoInfo(videoId: string) {
     );
 
     const ytVideoData = await ytVideoResponse.json();
-    console.log("ytVideoData is ", ytVideoData);
     if (!ytVideoData.items || ytVideoData.items.length === 0) {
       throw new Error("No items Found.");
     }

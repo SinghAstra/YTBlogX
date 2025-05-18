@@ -1,6 +1,5 @@
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { Navbar } from "@/components/dashboard/navbar";
-import { RightSidebar } from "@/components/dashboard/right-sidebar";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -39,8 +38,7 @@ async function DashboardLayout({ children }: DashboardLayoutProps) {
       <Navbar user={session.user} />
       <div className="flex pt-16">
         <LeftSidebar videos={videos} />
-        <main className="hidden md:flex flex-1 ml-96  ">{children}</main>
-        <RightSidebar />
+        <main className="hidden md:flex flex-1 ml-96">{children}</main>
       </div>
     </div>
   );

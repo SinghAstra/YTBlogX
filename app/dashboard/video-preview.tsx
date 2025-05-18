@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { VideoInfo } from "@/interfaces/video";
 import Image from "next/image";
+import { useState } from "react";
 
 interface VideoPreviewProps {
   videoDetails: VideoInfo;
@@ -11,18 +12,23 @@ interface VideoPreviewProps {
 
 export function VideoPreview({ videoDetails }: VideoPreviewProps) {
   const { title, channelName, videoThumbnail, channelThumbnail } = videoDetails;
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="w-full md:w-1/3 aspect-video relative bg-gray-100 rounded-md overflow-hidden">
+          <div className="w-full md:w-1/3 aspect-video relative rounded-md overflow-hidden">
+            {!isImageLoaded && (
+              <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-muted/20 via-muted/40 to-muted/60" />
+            )}
             <Image
               src={videoThumbnail}
               alt={title}
               width={320}
               height={180}
-              className="object-cover"
+              onLoad={() => setIsImageLoaded(true)}
+              className="object-cover "
             />
           </div>
           <div className="w-full md:w-2/3">

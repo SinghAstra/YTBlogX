@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoInfo } from "@/interfaces/video";
-import { InfoIcon as InfoCircle } from "lucide-react";
+import { InfoIcon as InfoCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { getVideoInfo } from "./action";
 import { FileUploader } from "./file-uploader";
@@ -21,6 +21,7 @@ export function TranscriptExtractor() {
   const [videoDetails, setVideoDetails] = useState<VideoInfo | null>(null);
   const [scriptContent, setScriptContent] = useState("");
   const [transcriptUrl, setTranscriptUrl] = useState("");
+  const [isSubmittingUrl, setIsSubmittingUrl] = useState(false);
 
   const { setToastMessage } = useToastContext();
 
@@ -36,6 +37,7 @@ export function TranscriptExtractor() {
   };
 
   const handleUrlSubmit = async () => {
+    setIsSubmittingUrl(true);
     const id = extractVideoId(videoUrl);
     if (!id) {
       setToastMessage("Please enter a valid YouTube video URL");
@@ -45,6 +47,7 @@ export function TranscriptExtractor() {
     setVideoId(id);
     await fetchVideoDetails(id);
     setStep(2);
+    setIsSubmittingUrl(false);
   };
 
   const fetchVideoDetails = async (id: string) => {
@@ -52,7 +55,7 @@ export function TranscriptExtractor() {
       const response = await getVideoInfo(id);
 
       if (!response) {
-        throw new Error("Failed to Fetch Video Info");
+        throw new Error("Check Your Internet Connection");
       }
       setVideoDetails(response);
     } catch (error) {
@@ -164,10 +167,17 @@ export function TranscriptExtractor() {
               />
               <Button
                 variant={"outline"}
-                className=" rounded rounded-l-none"
+                className="rounded rounded-l-none "
+                disabled={isSubmittingUrl}
                 onClick={handleUrlSubmit}
               >
-                Next
+                {isSubmittingUrl ? (
+                  <div className="flex gap-2">
+                    <Loader2 /> Wait ...
+                  </div>
+                ) : (
+                  "Next"
+                )}
               </Button>
             </div>
           </div>
