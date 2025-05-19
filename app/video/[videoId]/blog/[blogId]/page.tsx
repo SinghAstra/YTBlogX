@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import BlogContent from "./blog";
+import BlogNavigation from "./blog-navigation";
 import Toc from "./toc";
 
 export async function generateMetadata({
@@ -83,8 +84,10 @@ export default async function BlogPage({
   return (
     <div className="flex flex-col  min-h-screen bg-background">
       {blog.content && <Toc content={blog.content} videoId={params.videoId} />}
-
-      <BlogContent blog={blog} />
+      <main className="flex-1 px-4 py-6 md:px-8 lg:px-12 mx-auto xl:ml-[20rem] xl:w-[calc(100%-20rem)] ">
+        <BlogContent blog={blog} />
+        <BlogNavigation part={blog.part} videoId={blog.video.id} />
+      </main>
     </div>
   );
 }
