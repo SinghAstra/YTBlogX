@@ -9,7 +9,7 @@ const SidebarRepoHeader = () => {
     <div className="p-2">
       <Link
         className={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        href="/dashboard?action=convert"
+        href="/dashboard"
       >
         <Plus className="mr-2 h-4 w-4" />
         Add Youtube Link

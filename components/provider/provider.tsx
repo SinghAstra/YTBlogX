@@ -1,9 +1,11 @@
 "use client";
 
 import { siteConfig } from "@/config/site";
+import { fetcher } from "@/lib/utils";
 import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import React, { ReactNode, Suspense } from "react";
+import { SWRConfig } from "swr";
 import { VideoProvider } from "../context/video";
 import { ToastProvider } from "./toast";
 
@@ -37,13 +39,15 @@ const LoadingFallback = () => {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <ToastProvider>
-        <SessionProvider>
-          <VideoProvider>
-            <div>{children}</div>
-          </VideoProvider>
-        </SessionProvider>
-      </ToastProvider>
+      <SWRConfig value={{ fetcher }}>
+        <ToastProvider>
+          <SessionProvider>
+            <VideoProvider>
+              <div>{children}</div>
+            </VideoProvider>
+          </SessionProvider>
+        </ToastProvider>
+      </SWRConfig>
     </Suspense>
   );
 };

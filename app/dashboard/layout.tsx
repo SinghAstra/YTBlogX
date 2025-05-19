@@ -31,8 +31,6 @@ async function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const { videos } = await fetchVideos();
 
-  // await activateBackendServer();
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar user={session.user} />

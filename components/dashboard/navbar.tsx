@@ -22,7 +22,7 @@ export function Navbar({ user }: NavbarProps) {
         <div className="ml-auto flex items-center gap-4">
           <Link
             className={cn(buttonVariants({ variant: "outline" }), "w-full")}
-            href="/dashboard?action=convert"
+            href="/dashboard"
           >
             <Plus className="h-5 w-5" />
             Add Youtube Link
