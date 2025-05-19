@@ -35,7 +35,7 @@ async function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-background">
       <Navbar user={session.user} />
       <div className="flex pt-16">
-        <LeftSidebar videos={videos} />
+        <LeftSidebar initialVideos={videos} />
         <main className="hidden md:flex flex-1 ml-96">{children}</main>
       </div>
     </div>

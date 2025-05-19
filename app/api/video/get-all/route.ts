@@ -7,25 +7,30 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     if (!session) {
       return Response.json(
-        { message: "Sign In to Get Started" },
+        { message: "Authentication required" },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    const user = await prisma.account.findFirst({
+    const videos = await prisma.video.findMany({
       where: {
-        userId,
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    return Response.json({ user }, { status: 201 });
+    return Response.json(videos);
   } catch (error) {
     if (error instanceof Error) {
-      console.log("error.stack is ", error.stack);
-      console.log("error.message is ", error.message);
+      console.log("Error message:", error.message);
+      console.log("Error stack:", error.stack);
     }
-    return Response.json({ message: "Failed to fetch User" }, { status: 500 });
+
+    return Response.json(
+      { message: "Failed to fetch videos" },
+      { status: 500 }
+    );
   }
 }

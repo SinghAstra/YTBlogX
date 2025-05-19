@@ -1,28 +1,25 @@
 "use client";
 
+import { fetchAllUserVideos } from "@/lib/api";
 import { Video } from "@prisma/client";
-import React, { useEffect } from "react";
-import { setUserVideos, useVideo } from "../context/video";
+import React from "react";
+import useSWR from "swr";
 import SidebarRepoHeader from "./left-sidebar-repo-header";
 import LeftSidebarVideoList from "./left-sidebar-video-list";
 
 interface LeftSidebarProps {
-  videos: Video[];
+  initialVideos: Video[];
 }
 
-export function LeftSidebar({ videos }: LeftSidebarProps) {
-  const { state, dispatch } = useVideo();
-
-  useEffect(() => {
-    if (videos && state.userVideos.length === 0) {
-      dispatch(setUserVideos(videos));
-    }
-  }, [dispatch, videos, state.userVideos.length]);
+export function LeftSidebar({ initialVideos }: LeftSidebarProps) {
+  const { data: videos } = useSWR<Video[]>(fetchAllUserVideos, {
+    fallbackData: initialVideos,
+  });
 
   return (
     <div className="w-full md:fixed md:inset-y-0 md:left-0 md:w-96 bg-background md:border-r md:border-dashed md:pt-16">
       <SidebarRepoHeader />
-      <LeftSidebarVideoList />
+      {videos && <LeftSidebarVideoList videos={videos} />}
     </div>
   );
 }

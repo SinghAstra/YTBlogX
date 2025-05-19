@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoInfo } from "@/interfaces/video";
+import { fetchAllUserVideos } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { mutate } from "swr";
 import { getVideoInfo } from "./action";
 import { VideoPreview } from "./video-preview";
 
@@ -169,6 +171,8 @@ export function TranscriptExtractor() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to Submit.");
       }
+
+      mutate(fetchAllUserVideos);
       setVideoUrl("");
       setStep(1);
     } catch (error) {
@@ -235,15 +239,15 @@ export function TranscriptExtractor() {
               the transcript JSON file. Follow these steps:
               <ol className="list-decimal list-inside mt-2 space-y-2">
                 <li>
-                  Open the video in YouTube :{" "}
                   <a
                     href={`https://www.youtube.com/watch?v=${videoId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-purple-500 hover:underline"
                   >
-                    Open Video
-                  </a>
+                    Open the video in YouTube
+                  </a>{" "}
+                  & Enable Captions
                 </li>
                 <li>
                   Right-click on the page and select{" "}

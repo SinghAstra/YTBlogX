@@ -18,7 +18,7 @@ const EmptyLeftSidebar = () => {
       </p>
       <Link
         className={cn(buttonVariants({ variant: "outline" }))}
-        href="/dashboard?action=convert"
+        href="/dashboard"
       >
         <Plus className="h-4 w-4 mr-2" />
         Generate Blogs

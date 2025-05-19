@@ -6,7 +6,6 @@ import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import React, { ReactNode, Suspense } from "react";
 import { SWRConfig } from "swr";
-import { VideoProvider } from "../context/video";
 import { ToastProvider } from "./toast";
 
 interface ProvidersProps {
@@ -42,9 +41,7 @@ const Providers = ({ children }: ProvidersProps) => {
       <SWRConfig value={{ fetcher }}>
         <ToastProvider>
           <SessionProvider>
-            <VideoProvider>
-              <div>{children}</div>
-            </VideoProvider>
+            <div>{children}</div>
           </SessionProvider>
         </ToastProvider>
       </SWRConfig>
