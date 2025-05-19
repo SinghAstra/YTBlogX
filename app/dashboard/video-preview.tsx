@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { VideoInfo } from "@/interfaces/video";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 interface VideoPreviewProps {
@@ -15,7 +16,7 @@ export function VideoPreview({ videoDetails, videoId }: VideoPreviewProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
-    <a href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank">
+    <Link href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank">
       <div className="p-4 bg-muted/20 hover:bg-muted/40 transition rounded ">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="w-full md:w-1/3 aspect-video relative rounded overflow-hidden">
@@ -28,7 +29,9 @@ export function VideoPreview({ videoDetails, videoId }: VideoPreviewProps) {
               width={320}
               height={180}
               onLoad={() => setIsImageLoaded(true)}
-              className="object-cover "
+              className={`object-cover transition-opacity duration-700 ${
+                isImageLoaded ? "opacity-100" : "opacity-0"
+              }`}
             />
           </div>
           <div className="w-full md:w-2/3 flex flex-col gap-2">
@@ -46,6 +49,6 @@ export function VideoPreview({ videoDetails, videoId }: VideoPreviewProps) {
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

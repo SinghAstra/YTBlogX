@@ -10,38 +10,31 @@ interface TerminalProps {
 function Terminal({ logs }: TerminalProps) {
   const logsEndRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
-  const [autoScroll, setAutoScroll] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  const scrollToBottom = () => {
-    setAutoScroll(true);
-  };
-
-  const handleScroll = () => {
-    if (!terminalRef.current) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = terminalRef.current;
-    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 60;
-
-    setAutoScroll(isScrolledToBottom);
-    setShowScrollButton(!isScrolledToBottom);
-  };
-
   useEffect(() => {
-    const terminalElement = terminalRef.current;
-    if (terminalElement) {
-      terminalElement.addEventListener("scroll", handleScroll);
-      return () => {
-        terminalElement.removeEventListener("scroll", handleScroll);
-      };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowScrollButton(!entry.isIntersecting);
+      },
+      {
+        root: terminalRef.current,
+        threshold: 1.0,
+      }
+    );
+
+    const logsEndRefVal = logsEndRef.current;
+
+    if (logsEndRefVal) {
+      observer.observe(logsEndRefVal);
     }
+
+    return () => {
+      if (logsEndRefVal) {
+        observer.unobserve(logsEndRefVal);
+      }
+    };
   }, []);
-
-  useEffect(() => {
-    if (autoScroll) {
-      logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [logs, autoScroll]);
 
   const formatDate = (createdAt: Date) => {
     const months = [
@@ -70,11 +63,15 @@ function Terminal({ logs }: TerminalProps) {
     return `${month} ${day} ${formattedTime}`;
   };
 
+  const scrollToBottom = () => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="w-full bg-background relative h-full">
       <div
         ref={terminalRef}
-        className="rounded-md p-4 overflow-y-auto h-full text-sm space-y-2"
+        className="rounded-md p-4 overflow-y-auto h-full text-sm space-y-2 relative flex-1"
       >
         {logs.map((log) => (
           <div

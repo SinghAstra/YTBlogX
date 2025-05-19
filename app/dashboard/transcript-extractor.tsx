@@ -11,6 +11,7 @@ import { useState } from "react";
 import { mutate } from "swr";
 import { getVideoInfo } from "./action";
 import { VideoPreview } from "./video-preview";
+import Link from "next/link";
 
 export function TranscriptExtractor() {
   const [videoUrl, setVideoUrl] = useState("");
@@ -212,11 +213,11 @@ export function TranscriptExtractor() {
               <Button
                 variant={"outline"}
                 className="rounded rounded-l-none "
-                disabled={isSubmittingUrl}
+                disabled={isSubmittingUrl || !videoUrl.trim()}
                 onClick={handleUrlSubmit}
               >
                 {isSubmittingUrl ? (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     <Loader2 className="h-4 w-4 animate-spin" /> Wait ...
                   </div>
                 ) : (
@@ -239,14 +240,14 @@ export function TranscriptExtractor() {
               the transcript JSON file. Follow these steps:
               <ol className="list-decimal list-inside mt-2 space-y-2">
                 <li>
-                  <a
+                  <Link
                     href={`https://www.youtube.com/watch?v=${videoId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-purple-500 hover:underline"
                   >
                     Open the video in YouTube
-                  </a>{" "}
+                  </Link>{" "}
                   & Enable Captions
                 </li>
                 <li>
@@ -281,10 +282,10 @@ export function TranscriptExtractor() {
                 variant="outline"
                 className="w-full rounded"
                 onClick={handleSubmit}
-                disabled={isSubmittingScript}
+                disabled={isSubmittingScript || !scriptContent.trim()}
               >
                 {isSubmittingScript ? (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     <Loader2 className="h-4 w-4 animate-spin" /> Wait ...
                   </div>
                 ) : (

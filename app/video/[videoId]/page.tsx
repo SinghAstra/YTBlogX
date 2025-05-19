@@ -95,7 +95,7 @@ export default async function VideoPage({
       <div className="lg:w-1/3 lg:max-w-md lg:fixed lg:h-[calc(100vh-4rem)] p-4 overflow-y-auto lg:border-dotted lg:border-r space-y-2">
         <Link
           href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-          className="hover:bg-muted/50 transition-all duration-200 rounded-md p-2 flex flex-col gap-4"
+          className="hover:bg-muted/50 transition-all duration-500 rounded-md p-2 flex flex-col gap-4"
           target="_blank"
         >
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
