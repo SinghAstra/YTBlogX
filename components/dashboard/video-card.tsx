@@ -55,8 +55,8 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   return (
     <div className="p-2 flex gap-2 flex-col rounded-sm group hover:bg-muted/40 border transition-all duration-200 cursor-pointer">
-      <div className="relative w-full rounded overflow-hidden">
-        <div className="w-full relative rounded-sm overflow-hidden">
+      <div className="relative w-full rounded-sm overflow-hidden">
+        <div className="w-full relative  overflow-hidden">
           {!isImageLoaded && (
             <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-muted/20 via-muted/40 to-muted/60" />
           )}
