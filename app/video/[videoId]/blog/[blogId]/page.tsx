@@ -79,8 +79,6 @@ export default async function BlogPage({
     notFound();
   }
 
-  console.log("blog.video.videoThumbnail is ", blog.video.videoThumbnail);
-
   return (
     <div className="flex flex-col  min-h-screen bg-background">
       {blog.content && <Toc content={blog.content} videoId={params.videoId} />}

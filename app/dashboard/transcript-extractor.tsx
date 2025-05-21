@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoInfo } from "@/interfaces/video";
 import { fetchAllUserVideos } from "@/lib/api";
+import { parseYoutubeUrl } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { mutate } from "swr";
 import { getVideoInfo } from "./action";
 import { VideoPreview } from "./video-preview";
-import Link from "next/link";
 
 export function TranscriptExtractor() {
   const [videoUrl, setVideoUrl] = useState("");
@@ -37,6 +38,12 @@ export function TranscriptExtractor() {
   };
 
   const handleUrlSubmit = async () => {
+    const { isValid, message } = parseYoutubeUrl(videoUrl);
+
+    if (!isValid) {
+      setToastMessage(message ?? "Invalid Youtube URL");
+      return;
+    }
     setIsSubmittingUrl(true);
     const id = extractVideoId(videoUrl);
     if (!id) {

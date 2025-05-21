@@ -57,7 +57,7 @@ export function parseYoutubeUrl(url: string): {
     return { isValid: false, message: "Invalid YouTube video URL." };
   }
 
-  return { isValid: true };
+  return { isValid: true, message: "Valid Youtube URL" };
 }
 
 export function convertISO8601ToTime(duration: string) {
