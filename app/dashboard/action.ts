@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { createCleanJobsToken } from "@/lib/service-auth";
 import { getServerSession } from "next-auth";
 
-const EXPRESS_API_URL = process.env.EXPRESS_API_URl;
 
 export async function fetchVideos() {
   try {
@@ -33,21 +32,6 @@ export async function fetchVideos() {
   }
 }
 
-export async function activateBackendServer() {
-  try {
-    if (!EXPRESS_API_URL) {
-      throw new Error("EXPRESS_API_URL is required.");
-    }
-    const response = await fetch(EXPRESS_API_URL);
-    const data = await response.json();
-    console.log("activateBackendServer data:", data);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log("error.stack is ", error.stack);
-      console.log("error.message is ", error.message);
-    }
-  }
-}
 
 export async function fetchProcessingVideos() {
   try {
@@ -78,6 +62,11 @@ export async function fetchProcessingVideos() {
 
 export async function stopVideoProcessing() {
   try {
+     const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
+    if (!EXPRESS_API_URL) {
+      throw new Error("EXPRESS_API_URL is not defined");
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -176,21 +165,33 @@ export async function getVideoInfo(videoId: string) {
   }
 }
 
-export async function waitForWakeUp() {
-  const MAX_RETRIES = 10;
+export async function wakeUpServer() {
+  try {
+    const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
+    const AWAKE_API_URL = process.env.AWAKE_API_URL;
+    if (!EXPRESS_API_URL) {
+      throw new Error("EXPRESS_API_URL is not defined");
+    }
+    if (!AWAKE_API_URL) {
+      throw new Error("AWAKE_API_URL is not defined");
+    }
 
-  if (process.env.ENV === "development") {
-    return;
-  }
+    const response = await fetch(`${AWAKE_API_URL}/api/wake-up`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ apiURL: EXPRESS_API_URL }),
+    });
 
-  for (let i = 0; i < MAX_RETRIES; i++) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/wake-up`
-    );
     const data = await response.json();
 
-    console.log("In waitForWakeUp, data is ", data);
-    if (data.isActive) return;
-    await new Promise((resolve) => setTimeout(resolve, 3000)); // wait 3 seconds
+    console.log("data is ", data);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
   }
 }
+
