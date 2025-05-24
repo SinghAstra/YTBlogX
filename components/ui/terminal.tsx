@@ -71,7 +71,7 @@ function Terminal({ logs }: TerminalProps) {
     <div className="w-full bg-background relative h-full">
       <div
         ref={terminalRef}
-        className="rounded-md p-4 overflow-y-auto h-full text-sm space-y-2 relative flex-1"
+        className="rounded-md px-4 overflow-y-auto h-full text-sm space-y-2 relative flex-1"
       >
         {logs.map((log) => (
           <div
