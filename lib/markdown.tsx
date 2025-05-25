@@ -1,8 +1,9 @@
 import Pre from "@/components/markdown/pre";
-import { cn } from "@/lib/utils";
 import React, { ComponentProps, memo } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrism from "rehype-prism-plus";
+import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
 
@@ -82,15 +83,19 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
         </code>
       );
     },
-    em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-      <em className={cn("not-italic", className)} {...props} />
-    ),
   };
 
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[preProcess, normalizeLanguage, rehypePrism, postProcess]}
+      rehypePlugins={[
+        preProcess,
+        normalizeLanguage,
+        rehypePrism,
+        postProcess,
+        rehypeSlug,
+        rehypeAutolinkHeadings,
+      ]}
       components={components}
     >
       {children}
