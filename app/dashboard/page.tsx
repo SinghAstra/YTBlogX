@@ -267,7 +267,7 @@ function DashboardPage() {
                     <span className="text-purple-500">Elements</span> Tab
                   </li>
                   <li>
-                    Click on any HTML Element and then press <kbd>Ctrl</kbd> +{" "}
+                    Click on any Script Element and then press <kbd>Ctrl</kbd> +{" "}
                     <kbd>F</kbd> and search for{" "}
                     <span className="text-purple-500">
                       ytInitialPlayerResponse

@@ -17,7 +17,7 @@ const Navbar = ({ user }: NavbarProps) => {
   return (
     <header
       className={cn(
-        "fixed top-0 inset-x-0 h-14 z-[99] border-b border-dashed backdrop-blur-lg"
+        "fixed top-4 inset-x-4 rounded border h-14 z-[99]  backdrop-blur-lg"
       )}
     >
       <FadeIn delay={0.2} className="size-full">

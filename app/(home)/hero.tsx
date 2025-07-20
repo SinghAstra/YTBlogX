@@ -1,10 +1,13 @@
 "use client";
 
+import ConicBackground from "@/components/componentX/conic-background";
+import MovingBackground from "@/components/componentX/moving-background";
 import FadeIn from "@/components/global/fade-in";
 import FadeSlideIn from "@/components/global/fade-slide-in";
 import MaxWidthWrapper from "@/components/global/max-width-wrapper";
 import { BackgroundShine } from "@/components/ui/background-shine";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { Button } from "@/components/ui/button";
 import GradientButton from "@/components/ui/gradient-button";
 import { LampContainer } from "@/components/ui/lamp";
 import { siteConfig } from "@/config/site";
@@ -13,7 +16,8 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
+import { FaTwitter } from "react-icons/fa";
 
 interface HeroSectionProps {
   isAuthenticated: boolean;
@@ -30,30 +34,44 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
     }
   };
 
-  useEffect(() => {
-    const wakeUpServer = async () => {
-      try {
-        const response = await fetch("/api/wake-up");
-        const data = await response.json();
-        console.log("wakeUpServer Response", data);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.log("error.stack is ", error.stack);
-          console.log("error.message is ", error.message);
-        }
-      }
-    };
-
-    wakeUpServer();
-  }, []);
-
   return (
     <div className="overflow-x-hidden scrollbar-hide ">
+      <div className="min-h-screen flex items-center justify-center relative">
+        <ConicBackground position="top" />
+        <div className="px-3 py-2 rounded text-center flex flex-col gap-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-wider uppercase">
+            Update
+          </h1>
+          <p>
+            Hey man! Thanks for Checking out the project but this one is not
+            working right now since Youtube has banned the server IP Address
+          </p>
+          <p>
+            Working on making an Electron and Mobile App out of this
+            project&apos;s logic
+          </p>
+          <a href={siteConfig.links.twitter} target="_blank">
+            <div className="p-1 relative rounded">
+              <Button
+                variant="outline"
+                className="rounded group relative font-normal bg-transparent hover:bg-muted/40"
+              >
+                <MovingBackground shineColor="hsl(var(--primary)/20)" />
+                <span className=" text-sm text-foreground flex items-center justify-center gap-2">
+                  <FaTwitter className="size-3" /> Follow For Updates
+                  <ArrowRightIcon className="size-3 transform-all duration-300 group-hover:translate-x-1" />
+                </span>
+              </Button>
+            </div>
+          </a>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <MaxWidthWrapper>
         <div className="flex flex-col items-center justify-center w-full ">
           <FadeIn
-            className="flex flex-col items-center justify-center w-full text-center"
+            className="flex flex-col items-center justify-center w-full text-center min-h-screen"
             delay={0.1}
           >
             <GradientButton onClick={handleGetStarted}>
